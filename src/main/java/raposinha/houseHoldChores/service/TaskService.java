@@ -1,8 +1,7 @@
-package raposinha.houseHoldChores.security;
+package raposinha.houseHoldChores.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import raposinha.houseHoldChores.entities.Task;
 
 @Service
 @AllArgsConstructor
