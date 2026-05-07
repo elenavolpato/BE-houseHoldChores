@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,11 +22,12 @@ public class Group {
     private Long id;
 
     // this represents the ADMIN/OWNER (1-to-1)
+    // it's nullable true in order do avoid circular reference.
     @OneToOne
-    @JoinColumn(name="user_id", referencedColumnName = "id")
+    @JoinColumn(name="admin_id", referencedColumnName = "id", nullable = true)
     private User owner;
 
-    // get all members
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-    private List<User> members;
+    // get all members | initializes the array as
+    @OneToMany(mappedBy = "group")
+    private List<User> members = new ArrayList<>();
 }

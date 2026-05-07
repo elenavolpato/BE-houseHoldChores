@@ -1,5 +1,6 @@
 package raposinha.houseHoldChores.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
+    @JsonIgnore
+    private String password;
+
     @Column(name="avatar_url")
     private String avatarUrl;
 
@@ -34,9 +39,12 @@ public class User {
     @JoinColumn(name="group_id")
     private Group group;
 
-    public User( String username, String email ,String avatarUrl) {
+    public User( String username, String email, String password ) {
         this.username = username;
         this.email = email;
-        this.avatarUrl = avatarUrl;
+        this.password = password;
+        // TODO: image will come from the frontend using the api directly there with a set of preset images. user will not be able to upload an image.
+        this.avatarUrl = "https://res.cloudinary.com/dga90puif/image/upload/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png";
     }
+
 }
