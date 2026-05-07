@@ -20,15 +20,36 @@ public class EmailSender {
 
     // registration email
     public SendEmailDTO sendRegistrationEmail(User recipient) {
-        HttpResponse<JsonNode> response = Unirest.post("https://api.mailgun.net/v3/" + this.domainName + "/messages")
-                .basicAuth("api", this.apiKey)
-                .queryString("from", "Epic Energy Services <epic.energy.services@administration.com>")
-                .queryString("to", recipient.getEmail()) // <-- DEVE ESSERE IL DESTINATARIO VERIFICATO!
-                .queryString("subject", "Welcome to Household Chores APP")
-                .queryString("text", "Hello, " + recipient.getUsername() + " "  + "! Welcome to the Household chores app! Happy organization :D")
-                .asJson();
+//        String apiKey = System.getenv("API_KEY");
+//        if (apiKey == null) {
+//            apiKey = "API_KEY";
+//        }
+        HttpResponse<String> response = Unirest.post(
+                        "https://api.mailgun.net/v3/" + domainName + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", "Household Chores App <mail@" + domainName + ">")
+                .field("to", recipient.getEmail())
+                .field("subject", "Welcome to Household Chores APP")
+                .field(
+                        "text",
+                        "Hello, " + recipient.getUsername()
+                                + "! Welcome to the Household chores app!"
+                )
+                .asString();
+
+        System.out.println(response.getStatus() + domainName);
         System.out.println(response.getBody());
-        return new SendEmailDTO("Email send to " + recipient.getEmail() + " successfully!", LocalDateTime.now());
+
+        if (response.getStatus() != 200) {
+            throw new RuntimeException(
+                    "Failed to send email: " + response.getBody()
+            );
+        }
+
+        return new SendEmailDTO(
+                "Email sent successfully to " + recipient.getEmail(),
+                LocalDateTime.now()
+        );
     }
 
 

@@ -1,5 +1,6 @@
 package raposinha.houseHoldChores.service;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +21,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     // USER REGISTRATION LOGIC
+    @Transactional
     public UUID save(UserRegistrationDTO body){
+        System.out.println("DEBUG: Save method started for email: " + body.getEmail());
         // check if email is already in use
         if(this.userRepo.existsByEmail(body.getEmail()))
             throw new BadRequestException("Email already in use");
@@ -31,15 +34,24 @@ public class UserService {
             passwordEncoder.encode(body.getPassword())
         );
 
+        // persistence
+        User savedUser;
         try {
-            User savedUser = this.userRepo.save(newUser);
-            return savedUser.getId();
-
+            savedUser = this.userRepo.save(newUser);
         } catch (DataIntegrityViolationException e) {
-            // catches database-level errors
-            throw new BadRequestException("Internal database error while saving user.");
-
+            throw new BadRequestException("Database error: could not save user.");
         }
+
+        // email Logic
+        try {
+            this.emailSender.sendRegistrationEmail(savedUser);
+        } catch (Exception e) {
+            System.err.println("CRITICAL: User created but email failed: " + e.getMessage());
+        }
+
+        return savedUser.getId();
+
+
     }
     // update user
 

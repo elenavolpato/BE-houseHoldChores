@@ -22,7 +22,7 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.sessionManagement(sessions -> sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         httpSecurity.formLogin(formLogin -> formLogin.disable());
         httpSecurity.csrf((csrf -> csrf.disable()));
