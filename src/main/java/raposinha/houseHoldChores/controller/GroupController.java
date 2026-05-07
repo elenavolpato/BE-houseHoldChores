@@ -2,10 +2,12 @@ package raposinha.houseHoldChores.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import raposinha.houseHoldChores.DTO.GroupCreateDTO;
 import raposinha.houseHoldChores.DTO.GroupResponseDTO;
+import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.GroupService;
 import raposinha.houseHoldChores.service.UserService;
@@ -29,4 +31,11 @@ public class GroupController {
         User adminUser = userService.findById(userId);
         return groupService.create(body, adminUser);
     }
+    //todo for authorization: only admin can add people to a group?
+    @PatchMapping("/{groupId}/members/{userId}")
+    public ResponseEntity<String> joinGroup(@PathVariable String groupId, @PathVariable UUID userId) {
+        String message = groupService.addUserToGroup(groupId, userId);
+        return ResponseEntity.ok(message);
+    }
+
 }
