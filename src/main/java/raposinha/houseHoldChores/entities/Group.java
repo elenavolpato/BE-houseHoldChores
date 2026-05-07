@@ -1,5 +1,6 @@
 package raposinha.houseHoldChores.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,5 +32,6 @@ public class Group {
 
     // get all members | initializes the array as
     @OneToMany(mappedBy = "group")
+    @JsonManagedReference
     private List<User> members = new ArrayList<>();
 }

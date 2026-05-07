@@ -12,6 +12,7 @@ import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.GroupService;
 import raposinha.houseHoldChores.service.UserService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -31,11 +32,22 @@ public class GroupController {
         User adminUser = userService.findById(userId);
         return groupService.create(body, adminUser);
     }
-    //todo for authorization: only admin can add people to a group?
+    //todo for authorization: only admin can add people to a group? think about it. is this something I want to restrict?
     @PatchMapping("/{groupId}/members/{userId}")
     public ResponseEntity<String> joinGroup(@PathVariable String groupId, @PathVariable UUID userId) {
         String message = groupService.addUserToGroup(groupId, userId);
         return ResponseEntity.ok(message);
     }
+
+    @GetMapping("/{groupId}")
+    public List<User> findGroupId(@PathVariable("groupId") String groupId){
+        return  userService.findByGroupId(groupId);
+    }
+
+    // remove user from group
+
+    // see all groups members
+
+    //see all group tasks
 
 }

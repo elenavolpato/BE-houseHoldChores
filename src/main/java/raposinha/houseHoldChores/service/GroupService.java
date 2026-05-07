@@ -7,7 +7,9 @@ import raposinha.houseHoldChores.DTO.GroupCreateDTO;
 import raposinha.houseHoldChores.DTO.GroupResponseDTO;
 import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.User;
+import raposinha.houseHoldChores.entities.enums.GroupRole;
 import raposinha.houseHoldChores.exception.NotFoundException;
+import raposinha.houseHoldChores.exception.UnauthorizedException;
 import raposinha.houseHoldChores.repositories.GroupRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 
@@ -20,24 +22,22 @@ public class GroupService {
     private final UserRepo userRepo;
     private UserService userService;
 
-
-
-
     // create group
     @Transactional
     public GroupResponseDTO create(GroupCreateDTO body, User adminUser) {
 
         // create group entity
         Group newGroup = new Group();
-        newGroup.setGroupName(body.getGroupName());
-
-        // set owner
-        newGroup.setOwner(adminUser);
 
         // set id for group with G-001
         long count = groupRepo.count() + 1;
-        String formattedCode = String.format("G-%03d", count);
-        newGroup.setId(formattedCode);
+        String newId = String.format("G-%03d", count + 1);
+        newGroup.setId(newId);
+
+        newGroup.setId(newId); // Manually setting the ID
+        newGroup.setGroupName(body.getGroupName());
+        newGroup.setOwner(adminUser);
+        adminUser.setRole(GroupRole.ADMIN);
 
         Group savedGroup = groupRepo.save(newGroup);
 
@@ -46,13 +46,12 @@ public class GroupService {
         userRepo.save(adminUser);
 
         return new GroupResponseDTO(
-                formattedCode,
+                newId,
                 savedGroup.getGroupName(),
                 adminUser.getId(),
                 // initialize empty list of members
                 null
         );
-
     }
 
     @Transactional
@@ -72,6 +71,20 @@ public class GroupService {
         return user.getUsername() + " has joined " + group.getGroupName();
 
     }
+    @Transactional
+    public void deleteGroup(String groupId, User requester) {
+        if (requester.getRole() != GroupRole.ADMIN) {
+            throw new UnauthorizedException("Only a group admin can delete the household!");
+        }
+        // ... delete logic todo
+    }
+
+
+    // remove user from group todo
+
+    // filters by category - see what Giorgia did on the previous project todo
+    // see all group tasks todo
+
 
 
 }

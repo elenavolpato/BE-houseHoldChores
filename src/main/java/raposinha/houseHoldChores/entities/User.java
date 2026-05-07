@@ -1,11 +1,13 @@
 package raposinha.houseHoldChores.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import raposinha.houseHoldChores.entities.enums.GroupRole;
 
 import java.util.UUID;
 
@@ -37,7 +39,11 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name="group_id")
+    @JsonBackReference
     private Group group;
+
+    @Enumerated(EnumType.STRING)
+    private GroupRole role;
 
     public User( String username, String email, String password ) {
         this.username = username;
@@ -45,6 +51,7 @@ public class User {
         this.password = password;
         // TODO: image will come from the frontend using the api directly there with a set of preset images. user will not be able to upload an image.
         this.avatarUrl = "https://res.cloudinary.com/dga90puif/image/upload/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png";
+        this.role = GroupRole.USER;
     }
 
 }

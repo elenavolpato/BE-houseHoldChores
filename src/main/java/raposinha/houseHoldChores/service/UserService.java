@@ -12,6 +12,7 @@ import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.repositories.UserRepo;
 import raposinha.houseHoldChores.tools.EmailSender;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -58,6 +59,10 @@ public class UserService {
     public User findById(UUID id) {
         return userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+    }
+
+    public List<User> findByGroupId(String id) {
+        return userRepo.findByGroup_Id(id);
     }
 
 }
