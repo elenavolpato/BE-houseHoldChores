@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import raposinha.houseHoldChores.DTO.UserRegistrationDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.exception.BadRequestException;
+import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.repositories.UserRepo;
 import raposinha.houseHoldChores.tools.EmailSender;
 
@@ -27,7 +28,6 @@ public class UserService {
         // check if email is already in use
         if(this.userRepo.existsByEmail(body.getEmail()))
             throw new BadRequestException("Email already in use");
-
         User newUser = new User(
             body.getUsername(),
             body.getEmail(),
@@ -42,19 +42,22 @@ public class UserService {
             throw new BadRequestException("Database error: could not save user.");
         }
 
-        // email Logic
+        //  send email Logic
         try {
             this.emailSender.sendRegistrationEmail(savedUser);
         } catch (Exception e) {
             System.err.println("CRITICAL: User created but email failed: " + e.getMessage());
         }
-
         return savedUser.getId();
-
-
     }
     // update user
 
     // add user to group
+
+
+    public User findById(UUID id) {
+        return userRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+    }
 
 }

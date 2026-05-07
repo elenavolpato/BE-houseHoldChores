@@ -16,6 +16,6 @@ public interface UserRepo extends JpaRepository<User, UUID> {
     // for authentication/login
     Optional<User> findByEmail(String email);
 
-    // find all members of a specific house
+    // find all members of a specific house/group
     List<User> findByGroupId(Long groupId);
 }

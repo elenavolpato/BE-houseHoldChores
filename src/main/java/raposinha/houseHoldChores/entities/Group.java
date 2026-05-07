@@ -21,6 +21,9 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column (name="group_name")
+    private String groupName;
+
     // this represents the ADMIN/OWNER (1-to-1)
     // it's nullable true in order do avoid circular reference.
     @OneToOne

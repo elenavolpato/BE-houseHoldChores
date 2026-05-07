@@ -17,7 +17,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED) // 200
+    @ResponseStatus(HttpStatus.CREATED) // 201
     public UUID registerUser(@Valid @RequestBody UserRegistrationDTO body){
         return userService.save(body);
     }

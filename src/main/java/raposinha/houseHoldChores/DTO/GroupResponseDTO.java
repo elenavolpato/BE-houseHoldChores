@@ -18,7 +18,7 @@ public class GroupResponseDTO {
     private Long id;
 
     @NotBlank
-    private String name;
+    private String groupName;
 
     @NotNull(message = "Every group must have an owner")
     private UUID ownerId;
