@@ -38,7 +38,7 @@ public class GroupController {
         String message = groupService.addUserToGroup(groupId, userId);
         return ResponseEntity.ok(message);
     }
-
+    // see all groups members
     @GetMapping("/{groupId}")
     public List<User> findGroupId(@PathVariable("groupId") String groupId){
         return  userService.findByGroupId(groupId);
@@ -57,7 +57,7 @@ public class GroupController {
         return ResponseEntity.ok(message);
     }
 
-    // see all groups members
+
 
     //see all group tasks
 

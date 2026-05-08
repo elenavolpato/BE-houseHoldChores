@@ -107,13 +107,16 @@ public class GroupService {
                 .orElseThrow(() -> new NotFoundException("Requester not found"));
 
         // admin cannot remove themselves
-        if (userIdToRemove.equals(requesterId)) {
+        if (userIdToRemove.equals(requesterId) && requester.getRole() == GroupRole.ADMIN) {
             throw new BadRequestException("Admins cannot remove themselves. Please delete the group or transfer ownership first.");
         }
 
-        // check if requester is admin of the group
-        if (requester.getRole() != GroupRole.ADMIN) {
-            throw new UnauthorizedException("Only the group admin can remove members.");
+        // You can pass if: You ARE the Admin OR you are removing YOURSELF
+        boolean isAdmin = requester.getRole() == GroupRole.ADMIN;
+        boolean isSelfRemoval = userIdToRemove.equals(requesterId);
+
+        if (!isAdmin && !isSelfRemoval) {
+            throw new UnauthorizedException("You don't have permission to remove this user.");
         }
 
         member.setGroup(null);
