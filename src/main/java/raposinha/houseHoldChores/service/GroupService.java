@@ -57,20 +57,24 @@ public class GroupService {
     }
 
     @Transactional
-    public String addUserToGroup(String groupId, UUID userId){
+    public String addUserToGroup(String groupId, UUID userId, UUID requesterId){
         // fetch user
-        User user = userService.findById(userId);
+        User member = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User to remove not found"));
+        User requester = userRepo.findById(requesterId)
+                .orElseThrow(() -> new NotFoundException("Requester not found"));
 
         // fetch group
         Group group = groupRepo.findById(groupId).orElseThrow(() -> new NotFoundException("Group  with id " + groupId + " not found."));
 
-        // link group and user
-        user.setGroup(group);
+        // if requester is not admin of group, it cannot add a member
+        if(!requesterId.equals(group.getOwner())){ throw new UnauthorizedException("Only ad admin can add a member to the group");}
+        member.setGroup(group);
 
         // save user as a group member
-        userRepo.save(user);
+        userRepo.save(member);
 
-        return user.getUsername() + " has joined " + group.getGroupName();
+        return member.getUsername() + " has joined " + group.getGroupName();
 
     }
     @Transactional

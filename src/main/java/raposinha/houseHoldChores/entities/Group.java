@@ -24,14 +24,15 @@ public class Group {
     @Column (name="group_name")
     private String groupName;
 
-    // this represents the ADMIN/OWNER (1-to-1)
     // it's nullable true in order do avoid circular reference.
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="admin_id", referencedColumnName = "id", nullable = true)
+    @ToString.Exclude
     private User owner;
 
     // get all members | initializes the array as
     @OneToMany(mappedBy = "group")
     @JsonManagedReference
+    @ToString.Exclude
     private List<User> members = new ArrayList<>();
 }

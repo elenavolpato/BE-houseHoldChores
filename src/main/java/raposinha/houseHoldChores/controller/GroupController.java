@@ -26,16 +26,14 @@ public class GroupController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED) // 201
-    public GroupResponseDTO createGroup(@RequestBody GroupCreateDTO body, @RequestHeader("User-ID") UUID userId // Manually pass the ID in Postman headers
+    public GroupResponseDTO createGroup(@RequestBody GroupCreateDTO body, @AuthenticationPrincipal User adminUser
                                         ) {
-        //TODO: after adding authentication use this to get the user logged in @AuthenticationPrincipal User user
-        User adminUser = userService.findById(userId);
+
         return groupService.create(body, adminUser);
     }
-    //todo for authorization: only admin can add people to a group? think about it. is this something I want to restrict?
     @PatchMapping("/{groupId}/members/{userId}")
-    public ResponseEntity<String> joinGroup(@PathVariable String groupId, @PathVariable UUID userId) {
-        String message = groupService.addUserToGroup(groupId, userId);
+    public ResponseEntity<String> joinGroup(@PathVariable String groupId, @PathVariable UUID userId, @AuthenticationPrincipal User requester) {
+        String message = groupService.addUserToGroup(groupId, userId, requester.getId());
         return ResponseEntity.ok(message);
     }
     // see all groups members

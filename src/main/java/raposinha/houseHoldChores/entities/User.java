@@ -44,6 +44,7 @@ public class User {
     @ManyToOne
     @JoinColumn(name="group_id")
     @JsonBackReference
+    @ToString.Exclude
     private Group group;
 
     @Enumerated(EnumType.STRING)
