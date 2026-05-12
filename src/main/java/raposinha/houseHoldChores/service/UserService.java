@@ -10,6 +10,7 @@ import raposinha.houseHoldChores.DTO.UserRegistrationResponseDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.exception.BadRequestException;
 import raposinha.houseHoldChores.exception.NotFoundException;
+import raposinha.houseHoldChores.repositories.GroupRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 import raposinha.houseHoldChores.tools.EmailSender;
 
@@ -22,6 +23,7 @@ public class UserService {
     private final UserRepo userRepo;
     private final EmailSender emailSender;
     private final PasswordEncoder passwordEncoder;
+    private final GroupRepo groupRepo;
 
     // USER REGISTRATION LOGIC
     @Transactional
@@ -63,6 +65,9 @@ public class UserService {
     }
 
     public List<User> findByGroupId(String id) {
+        if (!groupRepo.existsById(id)) {
+            throw new NotFoundException("Group with ID " + id + " not found");
+        }
         return userRepo.findByGroup_Id(id);
     }
 

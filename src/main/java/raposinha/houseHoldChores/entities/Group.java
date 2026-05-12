@@ -30,7 +30,7 @@ public class Group {
     @ToString.Exclude
     private User owner;
 
-    // get all members | initializes the array as
+    // get all members | initializes the array
     @OneToMany(mappedBy = "group")
     @JsonManagedReference
     @ToString.Exclude

@@ -68,7 +68,7 @@ public class GroupService {
         Group group = groupRepo.findById(groupId).orElseThrow(() -> new NotFoundException("Group  with id " + groupId + " not found."));
 
         // if requester is not admin of group, it cannot add a member
-        if(!requesterId.equals(group.getOwner())){ throw new UnauthorizedException("Only ad admin can add a member to the group");}
+        if(!requesterId.equals(group.getOwner().getId())){ throw new UnauthorizedException("Only a group admin can add a member to the group");}
         member.setGroup(group);
 
         // save user as a group member
@@ -77,37 +77,13 @@ public class GroupService {
         return member.getUsername() + " has joined " + group.getGroupName();
 
     }
-    @Transactional
-        public void deleteGroup(String groupId, UUID requesterId) {
-        // check if logged in user is the admin of this group todo
-            User foundUser = userRepo.findById(requesterId)
-                    .orElseThrow(() -> new NotFoundException("User not found"));
-
-            Group foundGroup = groupRepo.findById(groupId)
-                    .orElseThrow(() -> new NotFoundException("Group not found"));
-
-            // only group admin/creator can delete group
-            if (foundUser.getRole() != GroupRole.ADMIN) {
-                throw new UnauthorizedException("Only a group admin can delete the household!");
-            }
-
-            //  Clear the relationship for ALL members
-            for (User member : foundGroup.getMembers()) {
-                member.setGroup(null);
-                member.setRole(null); // Reset their role too
-                userRepo.save(member);
-            }
-
-            groupRepo.delete(foundGroup);
-
-    }
 
     // remove user from group
     @Transactional
-    public String removeUserFromGroup(String groupId, UUID userIdToRemove, UUID requesterId) {
+    public String removeUserFromGroup(String groupId, UUID userIdToRemove, User requester) {
         User member = userRepo.findById(userIdToRemove)
                 .orElseThrow(() -> new NotFoundException("User to remove not found"));
-        User requester = userRepo.findById(requesterId)
+        User requesterId = userRepo.findById(requester.getId())
                 .orElseThrow(() -> new NotFoundException("Requester not found"));
 
         // admin cannot remove themselves
@@ -129,6 +105,30 @@ public class GroupService {
         userRepo.save(member);
 
         return member.getUsername() + " was succesfully removed from group " + groupId;
+    }
+
+    @Transactional
+    public void deleteGroup(String groupId, User requester) {
+        User foundUser = userRepo.findById(requester.getId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Group foundGroup = groupRepo.findById(groupId)
+                .orElseThrow(() -> new NotFoundException("Group not found"));
+
+        // only group admin/creator can delete group
+        if (foundUser.getRole() != GroupRole.ADMIN) {
+            throw new UnauthorizedException("Only a group admin can delete the household!");
+        }
+
+        //  Clear the relationship for ALL members
+        for (User member : foundGroup.getMembers()) {
+            member.setGroup(null);
+            member.setRole(null); // Reset their role too
+            userRepo.save(member);
+        }
+
+        groupRepo.delete(foundGroup);
+
     }
 
 

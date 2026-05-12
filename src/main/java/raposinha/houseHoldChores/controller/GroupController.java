@@ -26,16 +26,23 @@ public class GroupController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED) // 201
-    public GroupResponseDTO createGroup(@RequestBody GroupCreateDTO body, @AuthenticationPrincipal User adminUser
-                                        ) {
-
+    public GroupResponseDTO createGroup(@RequestBody GroupCreateDTO body, @AuthenticationPrincipal User adminUser) {
         return groupService.create(body, adminUser);
     }
+    // add user to a group the  - admin only feature
     @PatchMapping("/{groupId}/members/{userId}")
-    public ResponseEntity<String> joinGroup(@PathVariable String groupId, @PathVariable UUID userId, @AuthenticationPrincipal User requester) {
+    public ResponseEntity<String> addUserToGroup(@PathVariable String groupId, @PathVariable UUID userId, @AuthenticationPrincipal User requester) {
         String message = groupService.addUserToGroup(groupId, userId, requester.getId());
         return ResponseEntity.ok(message);
     }
+
+    // remove user from group
+    @PatchMapping("/remove/members/{groupId}/{userToRemove}")
+    public ResponseEntity<String> removeUser(@PathVariable("groupId") String groupId,  @PathVariable("userToRemove") UUID userToRemove, @AuthenticationPrincipal User requester){
+        String message = groupService.removeUserFromGroup(groupId, userToRemove, requester);
+        return ResponseEntity.ok(message);
+    }
+
     // see all groups members
     @GetMapping("/{groupId}")
     public List<User> findGroupId(@PathVariable("groupId") String groupId){
@@ -43,17 +50,11 @@ public class GroupController {
     }
 
     @DeleteMapping("/delete/{groupId}")
-    public void deleteGroup(@PathVariable("groupId") String groupId, @RequestHeader("User-ID") UUID userId){
-        // todo: how to get the id from the loggedin user?
-        groupService.deleteGroup(groupId, userId);
+    public void deleteGroup(@PathVariable("groupId") String groupId, @AuthenticationPrincipal User requester){
+        groupService.deleteGroup(groupId, requester);
     }
 
-    // remove user from group
-    @PatchMapping("/remove/members/{groupId}/{userToRemove}")
-    public ResponseEntity<String> removeUser(@PathVariable("groupId") String groupId,  @PathVariable("userToRemove") UUID userToRemove, @RequestHeader("User-ID") UUID requesterId){
-        String message = groupService.removeUserFromGroup(groupId, userToRemove, requesterId);
-        return ResponseEntity.ok(message);
-    }
+
 
 
 
