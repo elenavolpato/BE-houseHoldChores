@@ -1,5 +1,6 @@
 package raposinha.houseHoldChores.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,10 +21,18 @@ public class Category {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String title;
+    private String name;
 
     private String description;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private String icon; // Optional: e.g., "fa-broom" or a URL
+
+    @OneToMany(mappedBy = "category")
+    @ToString.Exclude
+    @JsonManagedReference
     private List<Task> tasks;
+
+    public Category(String name) {
+        this.name = name;
+    }
 }
