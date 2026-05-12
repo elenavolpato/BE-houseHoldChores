@@ -54,21 +54,19 @@ public class UserService {
         }
         return new UserRegistrationResponseDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail(), savedUser.getAvatarUrl(), null);
     }
-    // update user
 
-    // add user to group
+    // update avatar URL
+    @Transactional
+    public String changeAvatarUrl(UUID id, String avatarUrl) {
+        User found = userRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " was not found"));
 
+        found.setAvatarUrl(avatarUrl);
+        return "Avatar changed successfully.";
+    }
 
     public User findById(UUID id) {
         return userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
     }
-
-    public List<User> findByGroupId(String id) {
-        if (!groupRepo.existsById(id)) {
-            throw new NotFoundException("Group with ID " + id + " not found");
-        }
-        return userRepo.findByGroup_Id(id);
-    }
-
 }

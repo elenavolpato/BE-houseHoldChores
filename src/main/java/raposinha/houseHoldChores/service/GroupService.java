@@ -14,6 +14,7 @@ import raposinha.houseHoldChores.exception.UnauthorizedException;
 import raposinha.houseHoldChores.repositories.GroupRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -131,6 +132,12 @@ public class GroupService {
 
     }
 
+    public List<User> findByGroupId(String id) {
+        if (!groupRepo.existsById(id)) {
+            throw new NotFoundException("Group with ID " + id + " not found");
+        }
+        return userRepo.findByGroup_Id(id);
+    }
 
     // filters by category - see what Giorgia did on the previous project todo
     // see all group tasks todo

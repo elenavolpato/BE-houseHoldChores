@@ -24,19 +24,15 @@ public class AuthService {
         this.tokenTools = tokenTools;
     }
 
-
-
     public LoginResponseDTO authenticate(LoginRequestDTO body) {
         User user = userRepo.findByEmail(body.email())
                 .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
-
 
         if (!passwordEncoder.matches(body.password(), user.getPassword())) {
             throw new UnauthorizedException("Invalid credentials");
         }
 
         String token = tokenTools.createToken(user);
-
         return new LoginResponseDTO(token, user.getUsername(), user.getAvatarUrl());
     }
 

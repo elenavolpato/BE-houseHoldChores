@@ -46,7 +46,7 @@ public class GroupController {
     // see all groups members
     @GetMapping("/{groupId}")
     public List<User> findGroupId(@PathVariable("groupId") String groupId){
-        return  userService.findByGroupId(groupId);
+        return  groupService.findByGroupId(groupId);
     }
 
     @DeleteMapping("/delete/{groupId}")
