@@ -7,8 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import raposinha.houseHoldChores.entities.enums.GroupRole;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -53,5 +57,14 @@ public class User {
         this.avatarUrl = "https://res.cloudinary.com/dga90puif/image/upload/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png";
         this.role = GroupRole.USER;
     }
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.role == null) {
+            return List.of();
+        }
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+    }
+
+
 
 }

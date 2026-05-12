@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import raposinha.houseHoldChores.DTO.UserRegistrationDTO;
+import raposinha.houseHoldChores.DTO.UserRegistrationRequestDTO;
+import raposinha.houseHoldChores.DTO.UserRegistrationResponseDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.exception.BadRequestException;
 import raposinha.houseHoldChores.exception.NotFoundException;
@@ -24,7 +25,7 @@ public class UserService {
 
     // USER REGISTRATION LOGIC
     @Transactional
-    public UUID save(UserRegistrationDTO body){
+    public UserRegistrationResponseDTO save(UserRegistrationRequestDTO body){
         System.out.println("DEBUG: Save method started for email: " + body.getEmail());
         // check if email is already in use
         if(this.userRepo.existsByEmail(body.getEmail()))
@@ -49,7 +50,7 @@ public class UserService {
         } catch (Exception e) {
             System.err.println("CRITICAL: User created but email failed: " + e.getMessage());
         }
-        return savedUser.getId();
+        return new UserRegistrationResponseDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail(), savedUser.getAvatarUrl(), null);
     }
     // update user
 

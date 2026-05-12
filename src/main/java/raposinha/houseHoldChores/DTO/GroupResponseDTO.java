@@ -24,5 +24,5 @@ public class GroupResponseDTO {
     private UUID ownerId;
 
     // returns the list of users so React can display the family members
-    private List<UserResponseDTO> members;
+    private List<UserRegistrationResponseDTO> members;
 }
