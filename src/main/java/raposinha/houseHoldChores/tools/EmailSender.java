@@ -61,4 +61,46 @@ public class EmailSender {
     }
 
 
+    //invite someone to app email
+    public void sendInvitationEmail(User inviter, String recipientEmail, String recipientName){
+        String htmlContent = """
+           <html>
+            <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+                <h1 style="color: #4A90E2;">You've been invited to the HouseHold Chores app!</h1>
+                <p>Hello <strong>%s</strong>,</p>
+                <p><strong>%s</strong> has invited you to join their household. Start organizing your home together by checking your assigned tasks.</p>
+                <br>
+                <a href="https://raposinha.dev" 
+                   style="background-color: #4A90E2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                   Download the app
+                </a>
+            </td>
+        </html>
+        """.formatted(recipientName, inviter.getUsername());
+
+        HttpResponse<String> response = Unirest.post(
+                        "https://api.mailgun.net/v3/" + domainName + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", "Household Chores App <invite@" + domainName + ">")
+                .field("to", recipientEmail)
+                .field("subject", "Invitation to Household Chores APP")
+                .field("text", "Welcome " + recipientName + "!")
+                .field("html", htmlContent)
+                .asString();
+
+        System.out.println(response.getStatus() + domainName);
+        System.out.println(response.getBody());
+
+        if (response.getStatus() != 200) {
+            throw new RuntimeException(
+                    "Failed to send email: " + response.getBody()
+            );
+        }
+
+        new SendEmailDTO(
+                "Email sent successfully to " + recipientEmail,
+                LocalDateTime.now()
+        );
+
+    }
 }
