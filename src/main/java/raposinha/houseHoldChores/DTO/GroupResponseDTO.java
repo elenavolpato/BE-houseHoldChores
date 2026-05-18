@@ -15,7 +15,7 @@ import java.util.UUID;
 public class GroupResponseDTO {
 
     @NotNull
-    private String id;
+    private Long id;
 
     @NotBlank
     private String groupName;

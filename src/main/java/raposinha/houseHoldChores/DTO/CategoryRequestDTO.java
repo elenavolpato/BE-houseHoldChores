@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryResponseDTO {
-    private Long id;
+public class CategoryRequestDTO {
+    @NotBlank(message = "Title is required")
     private String title;
     private String description;
     private String icon;

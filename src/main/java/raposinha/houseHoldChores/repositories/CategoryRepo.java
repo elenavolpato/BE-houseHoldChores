@@ -14,8 +14,11 @@ public interface CategoryRepo extends JpaRepository<Category, Long> {
     // title of categories are unique - this checks if they are already in use
     boolean existsByName(String category);
 
+    Optional<Category> findByName(String field);
+
     // fetch categories specific to a family
    // List<Category> findByGroupId(Long groupId);
 
+    
 
 }

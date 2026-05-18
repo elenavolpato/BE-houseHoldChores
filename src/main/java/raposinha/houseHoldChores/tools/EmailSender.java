@@ -1,7 +1,6 @@
 package raposinha.houseHoldChores.tools;
 
 import kong.unirest.core.HttpResponse;
-import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,22 +18,31 @@ public class EmailSender {
     }
 
     // registration email
-    public SendEmailDTO sendRegistrationEmail(User recipient) {
-//        String apiKey = System.getenv("API_KEY");
-//        if (apiKey == null) {
-//            apiKey = "API_KEY";
-//        }
+    public void sendRegistrationEmail(User recipient) {
+        String htmlContent = """
+            <html>
+                <body style="font-family: Arial, sans-serif; color: #333;">
+                    <h1 style="color: #4A90E2;">Welcome %s!</h1>
+                    <p>We are thrilled to have you on board.</p>
+                    <p>Start organizing your home by checking your assigned tasks.</p>
+                    <br>
+                    <button>
+                        <a href="https://raposinha.dev" 
+                        style=" text-decoration: none;">
+                        Open Dashboard
+                        </a>
+                    </button>
+                </body>
+            </html>
+            """.formatted(recipient.getUsername());
         HttpResponse<String> response = Unirest.post(
                         "https://api.mailgun.net/v3/" + domainName + "/messages")
                 .basicAuth("api", apiKey)
-                .field("from", "Household Chores App <mail@" + domainName + ">")
+                .field("from", "Household Chores App <welcome@" + domainName + ">")
                 .field("to", recipient.getEmail())
                 .field("subject", "Welcome to Household Chores APP")
-                .field(
-                        "text",
-                        "Hello, " + recipient.getUsername()
-                                + "! Welcome to the Household chores app!"
-                )
+                .field("text", "Welcome " + recipient.getUsername() + "!")
+                .field("html", htmlContent)
                 .asString();
 
         System.out.println(response.getStatus() + domainName);
@@ -46,7 +54,7 @@ public class EmailSender {
             );
         }
 
-        return new SendEmailDTO(
+        new SendEmailDTO(
                 "Email sent successfully to " + recipient.getEmail(),
                 LocalDateTime.now()
         );

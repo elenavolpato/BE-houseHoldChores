@@ -32,12 +32,8 @@ public class GroupService {
         // create group entity
         Group newGroup = new Group();
 
-        // set id for group with G-001
-        long count = groupRepo.count() + 1;
-        String newId = String.format("G-%03d", count + 1);
-        newGroup.setId(newId);
 
-        newGroup.setId(newId); // Manually setting the ID
+         // Manually setting the ID
         newGroup.setGroupName(body.getGroupName());
         newGroup.setOwner(adminUser);
         adminUser.setRole(GroupRole.ADMIN);
@@ -49,10 +45,10 @@ public class GroupService {
         userRepo.save(adminUser);
 
         return new GroupResponseDTO(
-                newId,
+                savedGroup.getId(),
                 savedGroup.getGroupName(),
                 adminUser.getId(),
-                // initialize empty list of members
+                // initialize empty list of members, but admin is a member?
                 null
         );
     }

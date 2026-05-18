@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-public class TaskCreateDTO {
+public class CreatePersonalizedTaskRequestDTO {
 
     @NotBlank(message = "Task title is required")
     private String title;
@@ -17,8 +17,10 @@ public class TaskCreateDTO {
     @NotNull(message = "A category must be selected")
     private Long categoryId;
 
-    // TODO: task can be unassigned initially? Do I want this feature?
-    //private UUID assignedToUserId;
+    private UUID assignedUserId;
+
+    @NotBlank(message = "Group ID is required")
+    private String groupId;
 
     @NotNull(message = "Due date is required")
     @FutureOrPresent(message = "Due date cannot be in the past")

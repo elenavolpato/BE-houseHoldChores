@@ -1,15 +1,192 @@
 package raposinha.houseHoldChores.service;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import raposinha.houseHoldChores.DTO.*;
+import raposinha.houseHoldChores.entities.*;
+import raposinha.houseHoldChores.exception.BadRequestException;
+import raposinha.houseHoldChores.exception.NotFoundException;
+import raposinha.houseHoldChores.exception.UnauthorizedException;
+import raposinha.houseHoldChores.repositories.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class TaskService {
 
-//    public Task createTask(Task task) {
-//        Task savedTask = repository.save(task);
-//        savedTask.setDisplayId("TASK-" + (1000 + savedTask.getId()));
-//        return repository.save(savedTask);
-  //  }
+    private PresetTaskRepo presetRepo;
+    private UserRepo userRepo;
+    private GroupRepo groupRepo;
+    private TaskRepo taskRepo;
+    private CategoryRepo categoryRepo;
+
+
+    //TODO create logic to check if logged in user is in this group
+
+    @Transactional
+    public TaskResponseDTO createTaskFromPreset(CreateTaskFromPresetDTO dto) {
+        // fetch presetTask]
+        PresetTask preset = presetRepo.findById(dto.presetId())
+                .orElseThrow(() -> new NotFoundException("Preset task not found"));
+
+        // fetch User and Group
+        User assignedUser = userRepo.findById(dto.assignedUserId()).orElseThrow();
+        Group group = groupRepo.findById(dto.groupId()).orElseThrow();
+
+        // create "Live" Task and copy data from the Preset
+        Task newTask = new Task();
+        newTask.setTitle(preset.getTitle());
+        newTask.setCategory(preset.getCategory());
+
+        // if user passed a custom frequency, use it. otherwise, use the preset one
+        newTask.setFrequency(dto.frequency() > 0 ? dto.frequency() : preset.getFrequency());
+
+        newTask.setUser(assignedUser);
+        newTask.setGroup(group);
+        newTask.setDueDate(dto.dueDate());
+        newTask.setCompleted(false);
+
+        Task savedTask = taskRepo.save(newTask);
+
+        return convertToResponseDTO(savedTask);
+    }
+
+    @Transactional
+    public TaskResponseDTO createPersonalizedTask(CreatePersonalizedTaskRequestDTO dto) {
+        Group group = groupRepo.findById(dto.getGroupId()).orElseThrow();
+        Category category = categoryRepo.findById(dto.getCategoryId()).orElseThrow();
+
+        // add task to the preset_task table with the group_id, so only member of this group can view this task
+        PresetTask customPreset = new PresetTask();
+        customPreset.setTitle(dto.getTitle());
+        customPreset.setCategory(category);
+        customPreset.setGroup(group); // links it ONLY to this household
+        customPreset.setFrequency(dto.getFrequency());
+        presetRepo.save(customPreset);
+
+        // saves as a live task too
+        Task task = new Task();
+        task.setTitle(dto.getTitle());
+        task.setCategory(category);
+        task.setGroup(group);
+        task.setDueDate(dto.getDueDate());
+        task.setFrequency(dto.getFrequency());
+        task.setCompleted(false);
+
+        if (dto.getAssignedUserId() != null) {
+            User user = userRepo.findById(dto.getAssignedUserId())
+                    .orElseThrow(() -> new NotFoundException("User not found with ID: " + dto.getAssignedUserId()));
+            task.setUser(user);
+        } else {
+            task.setUser(null); // explicitly unassigned
+        }
+
+        return convertToResponseDTO(taskRepo.save(task));
+    }
+
+
+
+    public String assignUserToTask(UUID userToAssign, Long taskId, User requester) {
+        //  find task
+        Task foundTask = taskRepo.findById(taskId).orElseThrow(() -> new NotFoundException("Task with id "+ taskId + " was not found."));
+        // from this foundTask, I get the groupId, and search for the owner.
+        Group taskGroup = foundTask.getGroup();
+        if (taskGroup == null) {
+            throw new BadRequestException("This task does not belong to any household group.");
+        }
+        // check if requester is admin of group
+        if (!taskGroup.getOwner().getId().equals(requester.getId())) {
+            throw new UnauthorizedException("Only the group administrator can assign tasks.");
+        }
+
+        // find user to be assigned
+        User worker = userRepo.findById(userToAssign)
+                .orElseThrow(() -> new NotFoundException("User to assign not found."));
+
+        // check if user belongs to group
+        if (worker.getGroup() == null || !worker.getGroup().getId().equals(taskGroup.getId())) {
+            throw new BadRequestException("The assigned user does not belong to this household group.");
+        }
+
+        // assign to user
+        foundTask.setUser(worker);
+        taskRepo.save(foundTask);
+
+        return "User " + worker.getUsername() + " successfully assigned to task: " + foundTask.getTitle();
+
+    }
+
+    @Transactional
+    public TaskResponseDTO updateDueDate(Long taskId, UpdateDueDateDTO dto, User requester) {
+        Task task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Task not found"));
+
+        // only admin can change deadlines
+        if (!task.getGroup().getOwner().getId().equals(requester.getId())) {
+            throw new UnauthorizedException("Only the group admin can change deadlines.");
+        }
+
+        task.setDueDate(dto.dueDate());
+        return convertToResponseDTO(taskRepo.save(task));
+    }
+
+    @Transactional
+    public TaskResponseDTO updateFrequency(Long taskId, UpdateFrequencyDTO dto, User requester) {
+        Task task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Task not found"));
+
+        // only admin can change frequencies
+        if (!task.getGroup().getOwner().getId().equals(requester.getId())) {
+            throw new UnauthorizedException("Only the group admin can change task frequencies.");
+        }
+
+        task.setFrequency(dto.frequency());
+        return convertToResponseDTO(taskRepo.save(task));
+    }
+
+    @Transactional
+    public TaskResponseDTO markAsCompleted(Long taskId, User requester) {
+        Task task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Task not found"));
+
+        // Security check: Requester must belong to the same household group as the task
+        if (requester.getGroup() == null || !requester.getGroup().getId().equals(task.getGroup().getId())) {
+            throw new UnauthorizedException("You do not belong to this household group.");
+        }
+
+        task.setCompleted(true);
+        return convertToResponseDTO(taskRepo.save(task));
+    }
+
+    public List<TaskResponseDTO> getTasksAssignedToUser(UUID userId, User requester) {
+        // Security check: Can only view tasks if requester shares the same household group
+        User targetUser = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (requester.getGroup() == null || !requester.getGroup().getId().equals(targetUser.getGroup().getId())) {
+            throw new UnauthorizedException("You can only view tasks of members in your own household.");
+        }
+
+        // Assumes your TaskRepo has a derived query method: findByUserId(UUID userId)
+        return taskRepo.findByUserId(userId).stream()
+                .map(this::convertToResponseDTO)
+                .toList();
+    }
+
+    private TaskResponseDTO convertToResponseDTO(Task task) {
+        return new TaskResponseDTO(
+                task.getId(),
+                task.getTitle(),
+                task.getCategory() != null ? task.getCategory().getName() : null,
+                task.getDueDate(),
+                task.isCompleted(),
+                task.getUser() != null ? task.getUser().getUsername() : "Unassigned",
+                task.getFrequency()
+        );
+    }
+
+
 }
