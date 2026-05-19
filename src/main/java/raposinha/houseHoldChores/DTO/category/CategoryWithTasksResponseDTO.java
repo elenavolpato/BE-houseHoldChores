@@ -3,7 +3,7 @@ package raposinha.houseHoldChores.DTO.category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import raposinha.houseHoldChores.DTO.task.TaskResponseDTO;
+import raposinha.houseHoldChores.DTO.task.PresetTaskDTO;
 
 import java.util.List;
 
@@ -15,5 +15,5 @@ public class CategoryWithTasksResponseDTO {
     private String title;
     private String description;
     private String icon;
-    private List<TaskResponseDTO> tasks;
+    private List<PresetTaskDTO> tasks;
 }

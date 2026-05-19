@@ -46,7 +46,7 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "assigned_to")
-    private User user;
+    private User assignedTo;
 
     @Column(name = "is_completed")
     private boolean isCompleted;

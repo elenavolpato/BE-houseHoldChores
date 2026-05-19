@@ -36,7 +36,8 @@ public class TaskDataRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (taskRepo.count() == 0) { // Only seed if the table is empty
+        //Check 'presetTaskRepo' instead of 'taskRepo' so it matches what we insert!
+        if (presetTaskRepo.count() == 0) { // Only seed if the table is empty
             System.out.println("SEEDER: Starting Task seeding...");
             InputStream taskStream = new ClassPathResource("csv/tasks.csv").getInputStream();
             importPresetTasks(taskStream);
@@ -68,7 +69,7 @@ public class TaskDataRunner implements CommandLineRunner {
                     t.setTitle(title);
                     t.setFrequency(frequency);
 
-                    presetTaskRepo.save(t);
+                    presetTaskRepo.saveAndFlush(t);
                 }
             }
         }

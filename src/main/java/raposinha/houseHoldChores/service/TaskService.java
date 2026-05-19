@@ -23,9 +23,6 @@ public class TaskService {
     private TaskRepo taskRepo;
     private CategoryRepo categoryRepo;
 
-
-    //TODO create logic to check if logged in user is in this group
-
     @Transactional
     public TaskResponseDTO createTaskFromPreset(CreateTaskFromPresetDTO dto) {
         // fetch presetTask]
@@ -44,7 +41,7 @@ public class TaskService {
         // if user passed a custom frequency, use it. otherwise, use the preset one
         newTask.setFrequency(dto.frequency() > 0 ? dto.frequency() : preset.getFrequency());
 
-        newTask.setUser(assignedUser);
+        newTask.setAssignedTo(assignedUser);
         newTask.setGroup(group);
         newTask.setDueDate(dto.dueDate());
         newTask.setCompleted(false);
@@ -79,9 +76,9 @@ public class TaskService {
         if (dto.getAssignedUserId() != null) {
             User user = userRepo.findById(dto.getAssignedUserId())
                     .orElseThrow(() -> new NotFoundException("User not found with ID: " + dto.getAssignedUserId()));
-            task.setUser(user);
+            task.setAssignedTo(user);
         } else {
-            task.setUser(null); // explicitly unassigned
+            task.setAssignedTo(null); // explicitly unassigned
         }
 
         return convertToResponseDTO(taskRepo.save(task));
@@ -112,7 +109,7 @@ public class TaskService {
         }
 
         // assign to user
-        foundTask.setUser(worker);
+        foundTask.setAssignedTo(worker);
         taskRepo.save(foundTask);
 
         return "User " + worker.getUsername() + " successfully assigned to task: " + foundTask.getTitle();
@@ -171,7 +168,7 @@ public class TaskService {
         }
 
 
-        return taskRepo.findByUserId(userId).stream()
+        return taskRepo.findByAssignedToId(userId).stream()
                 .map(this::convertToResponseDTO)
                 .toList();
     }
@@ -183,7 +180,7 @@ public class TaskService {
                 task.getCategory() != null ? task.getCategory().getName() : null,
                 task.getDueDate(),
                 task.isCompleted(),
-                task.getUser() != null ? task.getUser().getUsername() : "Unassigned",
+                task.getAssignedTo() != null ? task.getAssignedTo().getUsername() : "Unassigned",
                 task.getFrequency()
         );
     }
