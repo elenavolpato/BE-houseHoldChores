@@ -1,4 +1,4 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.task;
 
 import java.time.LocalDateTime;
 

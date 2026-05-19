@@ -1,4 +1,4 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.user;
 
 import java.util.UUID;
 

@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_id_gen")
     @SequenceGenerator(
             name = "task_id_gen",
             sequenceName = "tasks_id_seq",
@@ -50,9 +50,4 @@ public class Task {
 
     @Column(name = "is_completed")
     private boolean isCompleted;
-
-
-    public void setId(Long id) {
-        this.id = 1000 + id;
-    }
 }

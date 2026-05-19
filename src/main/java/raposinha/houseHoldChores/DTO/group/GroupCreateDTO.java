@@ -1,4 +1,4 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.group;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,10 +1,11 @@
 package raposinha.houseHoldChores.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import raposinha.houseHoldChores.DTO.CategoryResponseDTO;
+import raposinha.houseHoldChores.DTO.category.CategoryResponseDTO;
+import raposinha.houseHoldChores.DTO.category.CategoryWithTasksResponseDTO;
 import raposinha.houseHoldChores.entities.Category;
+import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.repositories.CategoryRepo;
 
 @Service
@@ -23,15 +24,12 @@ public class CategoryService {
     }
 
     public CategoryResponseDTO saveAndReturnDTO(String name, String desc, String icon) {
-        // 1. Create the Entity using your logic
         Category category = new Category(name);
         category.setDescription(desc);
         category.setIcon(icon == null ? "house" : icon);
 
-        // 2. Persist to Database
         Category saved = categoryRepo.save(category);
 
-        // 3. Manually "Map" to the DTO
         CategoryResponseDTO dto = new CategoryResponseDTO();
         dto.setId(saved.getId());
         dto.setTitle(saved.getName()); // Mapping name -> title
@@ -39,6 +37,11 @@ public class CategoryService {
         dto.setIcon(saved.getIcon());
 
         return dto;
+    }
+
+    public CategoryWithTasksResponseDTO getSingleCategory(String name){
+        Category found = categoryRepo.findByName(name).orElseThrow(() -> new NotFoundException("No categories with this name were found."));
+        return categoryRepo.findById(found.getId());
     }
 
 

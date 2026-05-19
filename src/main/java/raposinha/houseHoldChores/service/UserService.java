@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import raposinha.houseHoldChores.DTO.UserRegistrationRequestDTO;
-import raposinha.houseHoldChores.DTO.UserRegistrationResponseDTO;
+import raposinha.houseHoldChores.DTO.user.UserRegistrationRequestDTO;
+import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.exception.BadRequestException;
 import raposinha.houseHoldChores.exception.NotFoundException;
@@ -14,7 +14,6 @@ import raposinha.houseHoldChores.repositories.GroupRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 import raposinha.houseHoldChores.tools.EmailSender;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service

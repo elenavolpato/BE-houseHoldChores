@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import raposinha.houseHoldChores.DTO.*;
+import raposinha.houseHoldChores.DTO.user.LoginRequestDTO;
+import raposinha.houseHoldChores.DTO.user.LoginResponseDTO;
+import raposinha.houseHoldChores.DTO.user.UserRegistrationRequestDTO;
+import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
 import raposinha.houseHoldChores.service.AuthService;
 import raposinha.houseHoldChores.service.UserService;
 

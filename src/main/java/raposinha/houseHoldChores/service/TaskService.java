@@ -3,7 +3,7 @@ package raposinha.houseHoldChores.service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import raposinha.houseHoldChores.DTO.*;
+import raposinha.houseHoldChores.DTO.task.*;
 import raposinha.houseHoldChores.entities.*;
 import raposinha.houseHoldChores.exception.BadRequestException;
 import raposinha.houseHoldChores.exception.NotFoundException;
@@ -162,7 +162,7 @@ public class TaskService {
     }
 
     public List<TaskResponseDTO> getTasksAssignedToUser(UUID userId, User requester) {
-        // Security check: Can only view tasks if requester shares the same household group
+        //can only view tasks if requester shares the same household group
         User targetUser = userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -170,7 +170,7 @@ public class TaskService {
             throw new UnauthorizedException("You can only view tasks of members in your own household.");
         }
 
-        // Assumes your TaskRepo has a derived query method: findByUserId(UUID userId)
+
         return taskRepo.findByUserId(userId).stream()
                 .map(this::convertToResponseDTO)
                 .toList();

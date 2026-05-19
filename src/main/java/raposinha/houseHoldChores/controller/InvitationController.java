@@ -5,10 +5,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import raposinha.houseHoldChores.DTO.SendInvitationDTO;
+import raposinha.houseHoldChores.DTO.SendInvitationEmailDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.InvitationService;
-import raposinha.houseHoldChores.tools.EmailSender;
 
 import java.util.Map;
 
@@ -21,7 +20,7 @@ public class InvitationController {
 
     @PostMapping("/send")
     public ResponseEntity<Map<String, String>> sendInvitation(
-            @Valid @RequestBody SendInvitationDTO dto,
+            @Valid @RequestBody SendInvitationEmailDTO dto,
             @AuthenticationPrincipal User inviter) {
 
         invitationService.processAndSendInvitation(inviter, dto);

@@ -1,4 +1,4 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.task;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
@@ -20,7 +20,7 @@ public class CreatePersonalizedTaskRequestDTO {
     private UUID assignedUserId;
 
     @NotBlank(message = "Group ID is required")
-    private String groupId;
+    private Long groupId;
 
     @NotNull(message = "Due date is required")
     @FutureOrPresent(message = "Due date cannot be in the past")

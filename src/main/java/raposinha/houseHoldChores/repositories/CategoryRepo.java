@@ -16,8 +16,8 @@ public interface CategoryRepo extends JpaRepository<Category, Long> {
 
     Optional<Category> findByName(String field);
 
-    // fetch categories specific to a family
-   // List<Category> findByGroupId(Long groupId);
+    // fetch categories
+    Optional<List<Category>> findById(Long id);
 
     
 

@@ -3,8 +3,9 @@ package raposinha.houseHoldChores.service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import raposinha.houseHoldChores.DTO.SendInvitationDTO;
+import raposinha.houseHoldChores.DTO.SendInvitationEmailDTO;
 import raposinha.houseHoldChores.entities.User;
+import raposinha.houseHoldChores.exception.EmailAlreadyExistsException;
 import raposinha.houseHoldChores.repositories.UserRepo;
 import raposinha.houseHoldChores.tools.EmailSender;
 
@@ -17,13 +18,12 @@ public class InvitationService {
     private final EmailSender emailSender;
 
     @Transactional
-    public void processAndSendInvitation(User inviter, SendInvitationDTO dto) {
-        // Business Rule 1: Check if already registered
+    public void processAndSendInvitation(User inviter, SendInvitationEmailDTO dto) {
+        // check if already registered
         if (userRepo.existsByEmail(dto.recipientEmail())) {
-            throw new IllegalArgumentException("This email address is already registered.");
+            throw new EmailAlreadyExistsException("This email address is already registered.");
         }
 
-        // Business Rule 2: Fire request to your Mailgun wrapper tool
         emailSender.sendInvitationEmail(inviter, dto.recipientEmail(), dto.recipientName());
     }
 }

@@ -1,4 +1,4 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.user;
 
 public record LoginRequestDTO (String email, String password){
 }

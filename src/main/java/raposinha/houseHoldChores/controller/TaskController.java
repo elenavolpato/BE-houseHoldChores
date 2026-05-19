@@ -7,7 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import raposinha.houseHoldChores.DTO.*;
+import raposinha.houseHoldChores.DTO.task.*;
+import raposinha.houseHoldChores.DTO.user.AssignUserDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.TaskService;
 

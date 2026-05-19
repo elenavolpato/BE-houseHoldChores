@@ -5,9 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import raposinha.houseHoldChores.DTO.GroupCreateDTO;
-import raposinha.houseHoldChores.DTO.GroupResponseDTO;
-import raposinha.houseHoldChores.entities.Group;
+import raposinha.houseHoldChores.DTO.group.GroupCreateDTO;
+import raposinha.houseHoldChores.DTO.group.GroupResponseDTO;
+import raposinha.houseHoldChores.DTO.group.UpdateGroupNameRequestDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.GroupService;
 import raposinha.houseHoldChores.service.UserService;
@@ -29,14 +29,14 @@ public class GroupController {
     public GroupResponseDTO createGroup(@RequestBody GroupCreateDTO body, @AuthenticationPrincipal User adminUser) {
         return groupService.create(body, adminUser);
     }
-    // add user to a group the  - admin only feature
+    // add user to a group - admin only feature
     @PatchMapping("/{groupId}/members/{userId}")
-    public ResponseEntity<String> addUserToGroup(@PathVariable String groupId, @PathVariable UUID userId, @AuthenticationPrincipal User requester) {
+    public ResponseEntity<String> addUserToGroup(@PathVariable Long groupId, @PathVariable UUID userId, @AuthenticationPrincipal User requester) {
         String message = groupService.addUserToGroup(groupId, userId, requester.getId());
         return ResponseEntity.ok(message);
     }
 
-    // remove user from group
+    // remove user from group - admin only feature
     @PatchMapping("/remove/members/{groupId}/{userToRemove}")
     public ResponseEntity<String> removeUser(@PathVariable("groupId") String groupId,  @PathVariable("userToRemove") UUID userToRemove, @AuthenticationPrincipal User requester){
         String message = groupService.removeUserFromGroup(groupId, userToRemove, requester);
@@ -45,19 +45,19 @@ public class GroupController {
 
     // see all groups members
     @GetMapping("/{groupId}")
-    public List<User> findGroupId(@PathVariable("groupId") String groupId){
+    public List<User> findGroupId(@PathVariable("groupId") Long groupId){
         return  groupService.findByGroupId(groupId);
     }
 
     @DeleteMapping("/delete/{groupId}")
-    public void deleteGroup(@PathVariable("groupId") String groupId, @AuthenticationPrincipal User requester){
+    public void deleteGroup(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal User requester){
         groupService.deleteGroup(groupId, requester);
     }
 
-
-
-
-
-    //see all group tasks
+    @PatchMapping("/{groupId}/rename")
+    public ResponseEntity<String> changeGroupName (@PathVariable("groupId") Long groupId, @RequestBody UpdateGroupNameRequestDTO newGroupName){
+        groupService.updateGroupName(groupId, newGroupName);
+        return ResponseEntity.ok("Group name changed to " + newGroupName.newGroupName());
+    }
 
 }

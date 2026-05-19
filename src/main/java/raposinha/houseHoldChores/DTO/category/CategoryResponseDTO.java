@@ -1,6 +1,5 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.category;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryRequestDTO {
-    @NotBlank(message = "Title is required")
+public class CategoryResponseDTO {
+    private Long id;
     private String title;
     private String description;
     private String icon;

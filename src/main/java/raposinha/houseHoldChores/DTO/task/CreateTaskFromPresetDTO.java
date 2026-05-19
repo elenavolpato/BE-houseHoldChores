@@ -1,4 +1,4 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.task;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -6,7 +6,7 @@ import java.util.UUID;
 public record CreateTaskFromPresetDTO(
         Long presetId,
         UUID assignedUserId,
-        String groupId,
+        Long groupId,
         LocalDateTime dueDate,
         int frequency
 ) {}

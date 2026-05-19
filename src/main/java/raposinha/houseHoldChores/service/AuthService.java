@@ -1,11 +1,10 @@
 package raposinha.houseHoldChores.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import raposinha.houseHoldChores.DTO.LoginRequestDTO;
-import raposinha.houseHoldChores.DTO.LoginResponseDTO;
+import raposinha.houseHoldChores.DTO.user.LoginRequestDTO;
+import raposinha.houseHoldChores.DTO.user.LoginResponseDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.exception.UnauthorizedException;
 import raposinha.houseHoldChores.repositories.UserRepo;

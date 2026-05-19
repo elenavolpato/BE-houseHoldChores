@@ -1,16 +1,19 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.category;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import raposinha.houseHoldChores.DTO.task.TaskResponseDTO;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryResponseDTO {
+public class CategoryWithTasksResponseDTO {
     private Long id;
     private String title;
     private String description;
     private String icon;
+    private List<TaskResponseDTO> tasks;
 }

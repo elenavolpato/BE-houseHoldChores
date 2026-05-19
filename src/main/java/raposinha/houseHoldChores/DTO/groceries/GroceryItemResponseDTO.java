@@ -1,4 +1,4 @@
-package raposinha.houseHoldChores.DTO;
+package raposinha.houseHoldChores.DTO.groceries;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

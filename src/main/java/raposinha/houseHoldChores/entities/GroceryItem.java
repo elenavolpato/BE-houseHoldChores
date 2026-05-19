@@ -1,5 +1,6 @@
 package raposinha.houseHoldChores.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "grocery_list")
+@Table(name = "grocery_items")
 @Getter
 @Setter
 @ToString
@@ -17,12 +18,19 @@ public class GroceryItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String item;
+    @Column(nullable = false)
+    private String name;
 
-    private int quantity;
+    @Column(nullable = false)
+    private Integer quantity = 1;
 
-    @ManyToOne
-    @JoinColumn(name="group_id")
-    private Group group;
+    @Column(name = "is_bought", nullable = false)
+    private boolean bought = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grocery_list_id", nullable = false)
+    @JsonBackReference
+    @ToString.Exclude
+    private GroceryList groceryList;
 
 }

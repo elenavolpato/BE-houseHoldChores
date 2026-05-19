@@ -3,8 +3,11 @@ package raposinha.houseHoldChores.service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import raposinha.houseHoldChores.DTO.GroupCreateDTO;
-import raposinha.houseHoldChores.DTO.GroupResponseDTO;
+import raposinha.houseHoldChores.DTO.group.GroupCreateDTO;
+import raposinha.houseHoldChores.DTO.group.GroupResponseDTO;
+import raposinha.houseHoldChores.DTO.group.UpdateGroupNameRequestDTO;
+import raposinha.houseHoldChores.DTO.user.MemberOfGroupResponseDTO;
+import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
 import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.entities.enums.GroupRole;
@@ -15,7 +18,6 @@ import raposinha.houseHoldChores.repositories.GroupRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,9 +33,6 @@ public class GroupService {
 
         // create group entity
         Group newGroup = new Group();
-
-
-         // Manually setting the ID
         newGroup.setGroupName(body.getGroupName());
         newGroup.setOwner(adminUser);
         adminUser.setRole(GroupRole.ADMIN);
@@ -54,7 +53,7 @@ public class GroupService {
     }
 
     @Transactional
-    public String addUserToGroup(String groupId, UUID userId, UUID requesterId){
+    public String addUserToGroup(Long groupId, UUID userId, UUID requesterId){
         // fetch user
         User member = userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User to remove not found"));
@@ -105,7 +104,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void deleteGroup(String groupId, User requester) {
+    public void deleteGroup(Long groupId, User requester) {
         User foundUser = userRepo.findById(requester.getId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -128,7 +127,25 @@ public class GroupService {
 
     }
 
-    public List<User> findByGroupId(String id) {
+    @Transactional
+    public GroupResponseDTO updateGroupName(Long groupId, UpdateGroupNameRequestDTO dto) {
+        Group group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new NotFoundException("Household group not found with ID: " + groupId));
+
+        group.setGroupName(dto.newGroupName());
+
+        List<MemberOfGroupResponseDTO> memberDtos = group.getMembers().stream()
+                .map(user -> new MemberOfGroupResponseDTO(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getGroup().getId()
+                ))
+                .toList();
+
+        return new GroupResponseDTO(group.getId(), group.getGroupName(), group.getOwner().getId(), memberDtos);
+    }
+
+    public List<User> findByGroupId(Long id) {
         if (!groupRepo.existsById(id)) {
             throw new NotFoundException("Group with ID " + id + " not found");
         }
@@ -136,8 +153,4 @@ public class GroupService {
     }
 
     // filters by category - see what Giorgia did on the previous project todo
-    // see all group tasks todo
-
-
-
 }

@@ -4,7 +4,7 @@ import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import raposinha.houseHoldChores.DTO.SendEmailDTO;
+import raposinha.houseHoldChores.DTO.SendRegistrationEmailDTO;
 import raposinha.houseHoldChores.entities.User;
 
 import java.time.LocalDateTime;
@@ -54,7 +54,7 @@ public class EmailSender {
             );
         }
 
-        new SendEmailDTO(
+        new SendRegistrationEmailDTO(
                 "Email sent successfully to " + recipient.getEmail(),
                 LocalDateTime.now()
         );
@@ -97,7 +97,7 @@ public class EmailSender {
             );
         }
 
-        new SendEmailDTO(
+        new SendRegistrationEmailDTO(
                 "Email sent successfully to " + recipientEmail,
                 LocalDateTime.now()
         );
