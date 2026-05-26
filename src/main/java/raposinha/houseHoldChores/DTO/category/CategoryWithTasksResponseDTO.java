@@ -15,5 +15,6 @@ public class CategoryWithTasksResponseDTO {
     private String title;
     private String description;
     private String icon;
+    private String colorCode;
     private List<PresetTaskDTO> tasks;
 }

@@ -1,9 +1,12 @@
 package raposinha.houseHoldChores.controller;
 
+import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import raposinha.houseHoldChores.DTO.category.CategoryRequestDTO;
 import raposinha.houseHoldChores.DTO.category.CategoryResponseDTO;
@@ -15,19 +18,22 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
+@AllArgsConstructor
+@Validated
 public class CategoryController {
-    @Autowired
-    private CategoryService categoryService;
 
+    private final CategoryService categoryService;
+    // POST /api/category/new
     @PostMapping("/new")
-    public CategoryResponseDTO addCategory(@RequestBody CategoryRequestDTO input) {
+    public CategoryResponseDTO addCategory(@Valid @RequestBody CategoryRequestDTO input) {
         return categoryService.saveAndReturnDTO(
                 input.getTitle(),
                 input.getDescription(),
-                input.getIcon()
+                input.getIcon(),
+                input.getColorCode()
         );
     }
-
+    // GET /api/category/filter/name?=Kitchen
     @GetMapping("/filter")
     public ResponseEntity<CategoryWithTasksResponseDTO> getCategoryWithTasks (
             @RequestParam("name") String name,

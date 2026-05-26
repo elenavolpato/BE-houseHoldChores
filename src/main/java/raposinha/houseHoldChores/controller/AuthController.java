@@ -1,5 +1,7 @@
 package raposinha.houseHoldChores.controller;
 
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -13,24 +15,22 @@ import raposinha.houseHoldChores.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
+@AllArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final AuthService authService;
 
-    @Autowired
-    private AuthService authService; // Service that handles password checking & JWT creation
-
+    // POST /api/auth/register
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserRegistrationResponseDTO register(@Validated @RequestBody UserRegistrationRequestDTO body) {
+    public UserRegistrationResponseDTO register(@Valid @RequestBody UserRegistrationRequestDTO body) {
         return userService.save(body);
     }
 
+    // POST /api/auth/login
     @PostMapping("/login")
-    public LoginResponseDTO login(@RequestBody LoginRequestDTO body) {
+    public LoginResponseDTO login(@Valid @RequestBody LoginRequestDTO body) {
         return authService.authenticate(body);
     }
-
-
 }

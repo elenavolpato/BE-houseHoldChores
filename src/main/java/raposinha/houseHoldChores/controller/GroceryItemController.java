@@ -3,6 +3,7 @@ package raposinha.houseHoldChores.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import raposinha.houseHoldChores.DTO.groceries.BulkItemRequestWrapperDTO;
 import raposinha.houseHoldChores.DTO.groceries.DeleteGroceryItemsRequestDTO;
@@ -16,10 +17,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/grocery-items")
 @AllArgsConstructor
+@Validated
 public class GroceryItemController {
 
     private final GroceryItemService groceryItemService;
 
+    // POST /api/grocery-items/1/new
     @PostMapping("/{groceryListId}/new")
     public ResponseEntity<List<GroceryItemResponseDTO>> addItems(
             @PathVariable("groceryListId") Long groceryListId,
@@ -29,6 +32,7 @@ public class GroceryItemController {
         return ResponseEntity.ok(response);
     }
 
+    // DELETE /api/grocery-items/1/delete
     @DeleteMapping("/{groceryListId}/delete")
     public ResponseEntity<Map<String, String>> removeItems(
             @PathVariable("groceryListId") Long groceryListId,
@@ -40,6 +44,7 @@ public class GroceryItemController {
         ));
     }
 
+    // PATCH api/grocery-items/1/update/2
     @PatchMapping("/{groceryListId}/update/{itemId}")
     public ResponseEntity<GroceryItemResponseDTO> updateItemFields(
             @PathVariable("groceryListId") Long groceryListId,

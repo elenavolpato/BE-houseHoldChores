@@ -18,11 +18,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/tasks")
 @AllArgsConstructor
+@Validated
 public class TaskController {
 
     private final TaskService taskService;
 
     // when a user selects a task from the preset tasks
+    // POST /api/tasks/preset
     @PostMapping("/preset")
     public ResponseEntity<TaskResponseDTO> createFromPreset(
             @Valid @RequestBody CreateTaskFromPresetDTO request) {
@@ -31,6 +33,7 @@ public class TaskController {
     }
 
     // when a user types in their own custom chore
+    // POST /api/tasks/personalized
     @PostMapping("/personalized")
     public ResponseEntity<TaskResponseDTO> createPersonalized(
             @Valid @RequestBody CreatePersonalizedTaskRequestDTO request) {
@@ -39,16 +42,18 @@ public class TaskController {
     }
 
     // assign task to someone
+    // PATCH /api/tasks/2/assign
     @PatchMapping("/{taskId}/assign")
     public ResponseEntity<String> assignUserToExistingTask(
             @PathVariable Long taskId,
-            @Validated @RequestBody AssignUserDTO body,
+            @Valid @RequestBody AssignUserDTO body,
             @AuthenticationPrincipal User requester) {
 
         String message = taskService.assignUserToTask(body.userId(), taskId, requester);
         return ResponseEntity.ok(message);
     }
 
+    //PATCH /api/tasks/1/due-date
     @PatchMapping("/{taskId}/due-date")
     public ResponseEntity<TaskResponseDTO> changeDueDate(
             @PathVariable Long taskId,
@@ -57,6 +62,7 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateDueDate(taskId, dto, requester));
     }
 
+    // PATCH /api/tasks/1/frequency
     @PatchMapping("/{taskId}/frequency")
     public ResponseEntity<TaskResponseDTO> changeFrequency(
             @PathVariable Long taskId,
@@ -65,6 +71,7 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateFrequency(taskId, dto, requester));
     }
 
+    // PATCH /api/tasks/1/complete
     @PatchMapping("/{taskId}/complete")
     public ResponseEntity<TaskResponseDTO> completeTask(
             @PathVariable Long taskId,
@@ -72,6 +79,7 @@ public class TaskController {
         return ResponseEntity.ok(taskService.markAsCompleted(taskId, requester));
     }
 
+    // GET /api/tasks/assigned-to/UUID
     @GetMapping("/assigned-to/{userId}")
     public ResponseEntity<List<TaskResponseDTO>> getTasksByUser(
             @PathVariable UUID userId,

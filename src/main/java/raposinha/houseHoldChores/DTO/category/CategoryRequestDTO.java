@@ -13,4 +13,5 @@ public class CategoryRequestDTO {
     private String title;
     private String description;
     private String icon;
+    private String colorCode;
 }

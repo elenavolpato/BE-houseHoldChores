@@ -27,6 +27,8 @@ public class Category {
 
     private String icon; // Optional: e.g., "fa-broom" or a URL
 
+    private String colorCode;
+
     @OneToMany(mappedBy = "category")
     @ToString.Exclude
     @JsonManagedReference

@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import raposinha.houseHoldChores.DTO.user.UpdateProfileRequestDTO;
+import raposinha.houseHoldChores.DTO.user.UserProfileResponseDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationRequestDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.exception.BadRequestException;
+import raposinha.houseHoldChores.exception.EmailAlreadyExistsException;
 import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.repositories.GroupRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
@@ -22,9 +25,8 @@ public class UserService {
     private final UserRepo userRepo;
     private final EmailSender emailSender;
     private final PasswordEncoder passwordEncoder;
-    private final GroupRepo groupRepo;
+    //private final GroupRepo groupRepo;
 
-    // USER REGISTRATION LOGIC
     @Transactional
     public UserRegistrationResponseDTO save(UserRegistrationRequestDTO body){
         System.out.println("DEBUG: Save method started for email: " + body.getEmail());
@@ -54,7 +56,6 @@ public class UserService {
         return new UserRegistrationResponseDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail(), savedUser.getAvatarUrl(), null);
     }
 
-    // update avatar URL
     @Transactional
     public String changeAvatarUrl(UUID id, String avatarUrl) {
         User found = userRepo.findById(id)
@@ -67,5 +68,47 @@ public class UserService {
     public User findById(UUID id) {
         return userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+    }
+
+    @Transactional
+    public UserProfileResponseDTO getUserProfile(UUID userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User account not found"));
+
+        return new UserProfileResponseDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getAvatarUrl(),
+                user.getGroup() != null ? user.getGroup().getId() : null,
+                user.getGroup() != null ? user.getGroup().getGroupName() : null,
+                user.getRole()
+        );
+    }
+
+    @Transactional
+    public UserProfileResponseDTO updateBasicInfo(UUID userId, UpdateProfileRequestDTO dto) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User account not found"));
+
+        // Check if email is being changed and is already taken by someone else
+        if (!user.getEmail().equalsIgnoreCase(dto.email()) && userRepo.existsByEmail(dto.email())) {
+            throw new EmailAlreadyExistsException("Email address is already in use by another user.");
+        }
+
+        user.setUsername(dto.username());
+        user.setEmail(dto.email());
+
+        userRepo.saveAndFlush(user);
+
+        return new UserProfileResponseDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getAvatarUrl(),
+                user.getGroup() != null ? user.getGroup().getId() : null,
+                user.getGroup() != null ? user.getGroup().getGroupName() : null,
+                user.getRole()
+        );
     }
 }

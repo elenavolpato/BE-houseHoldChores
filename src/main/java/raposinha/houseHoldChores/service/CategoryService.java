@@ -23,16 +23,20 @@ public class CategoryService {
     private final CategoryRepo categoryRepo;
     private final PresetTaskRepo presetTaskRepo;
 
-    public Category createCategory(String name, String desc, String icon) {
+    public Category createCategory(String name, String desc, String icon, String colorCode) {
         Category c = new Category(name);
         c.setDescription(desc);
         // fallback icon, in case user does not select one
         if(icon == null){ c.setIcon("house");     }
         else {c.setIcon(icon);}
+
+        // fallback color
+        if (colorCode== null){ c.setColorCode("#0d7377");}
+        else { c.setColorCode(colorCode); }
         return c;
     }
 
-    public CategoryResponseDTO saveAndReturnDTO(String name, String desc, String icon) {
+    public CategoryResponseDTO saveAndReturnDTO(String name, String desc, String icon, String colorCode) {
         Category category = new Category(name);
         category.setDescription(desc);
         category.setIcon(icon == null ? "house" : icon);
@@ -74,6 +78,7 @@ public class CategoryService {
                 category.getName(),
                 category.getDescription(),
                 category.getIcon(),
+                category.getColorCode(), 
                 taskDtos
         );
     }

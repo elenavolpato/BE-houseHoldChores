@@ -25,21 +25,22 @@ public class CategoryDataRunner implements CommandLineRunner {
     public void run(String @NonNull ... args) throws Exception {
 
         Map<String, String[]> categoriesToSeed = Map.of(
-                "Cleaning", new String[]{"General house cleaning tasks", "broom-icon"},
-                "Groceries", new String[]{"Shopping and food supplies", "shopping-cart"},
-                "Laundry", new String[]{"Washing, drying, and folding", "tshirt"},
-                "Garden", new String[]{"Outdoor maintenance and plants", "leaf"},
-                "Bills", new String[]{"Monthly payments and finances", "money-bill"},
-                "Kitchen", new String[]{"Cooking, washing dishes, and cleaning", "pan"},
-                "Pets", new String[]{"Pets care ans cleaning", "dog"}
+                "Cleaning", new String[]{"General house cleaning tasks", "broom", "#E53D00"},
+                "Groceries", new String[]{"Shopping and food supplies", "cart-shopping", "#E53D00"},
+                "Laundry", new String[]{"Washing, drying, and folding", "shirt", "#296EB4 "},
+                "Garden", new String[]{"Outdoor maintenance and plants", "leaf", "#BA324F "},
+                "Bills", new String[]{"Monthly payments and finances", "money-bills", "#8D5A97"},
+                "Kitchen", new String[]{"Cooking, washing dishes, and cleaning", "sink", "#94AE89"},
+                "Pets", new String[]{"Pets care and cleaning", "paw", "#20063B"}
         );
         categoriesToSeed.forEach((name, details) -> {
             // check if entity is already created
             if (!categoryRepo.existsByName(name)) {
                 String description = details[0];
                 String icon = details[1];
+                String colorCode = details[2];
 
-                Category cat = categoryService.createCategory(name, description, icon);
+                Category cat = categoryService.createCategory(name, description, icon, colorCode);
 
                 // 2. FORCE Hibernate to write it to disk immediately
                 categoryRepo.saveAndFlush(cat);

@@ -12,4 +12,5 @@ public class CategoryResponseDTO {
     private String title;
     private String description;
     private String icon;
+    private String colorCode;
 }

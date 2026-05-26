@@ -18,6 +18,7 @@ public class InvitationController {
 
     private final InvitationService invitationService;
 
+    // POST /api/invitations/send
     @PostMapping("/send")
     public ResponseEntity<Map<String, String>> sendInvitation(
             @Valid @RequestBody SendInvitationEmailDTO dto,
