@@ -7,14 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import raposinha.houseHoldChores.DTO.user.JoinGroupRequestDTO;
-import raposinha.houseHoldChores.DTO.user.UpdateAvatarRequestDTO;
-import raposinha.houseHoldChores.DTO.user.UpdateProfileRequestDTO;
-import raposinha.houseHoldChores.DTO.user.UserProfileResponseDTO;
+import raposinha.houseHoldChores.DTO.group.GroupResponseDTO;
+import raposinha.houseHoldChores.DTO.user.*;
+import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.User;
+import raposinha.houseHoldChores.repositories.GroupRepo;
+import raposinha.houseHoldChores.repositories.UserRepo;
+import raposinha.houseHoldChores.service.GroupService;
 import raposinha.houseHoldChores.service.UserService;
 
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,6 +27,7 @@ import java.util.Map;
 public class UserController {
 
    private final UserService userService;
+   private final GroupService groupService;
 
     // update avatar
     // PATCH /api/users/avatar
@@ -59,14 +64,18 @@ public class UserController {
             @AuthenticationPrincipal User user,
             @Valid @RequestBody JoinGroupRequestDTO dto) { // dto contains String inviteCode
 
-        userService.joinGroup(user.getId(), dto.getInviteCode());
+        //userService.joinGroup(user.getId(), dto.getInviteCode());
         return ResponseEntity.ok("Successfully joined the household group!");
     }
 
     // DELETE /api/users/group/leave
     @DeleteMapping("/group/leave")
     public ResponseEntity<String> leaveGroup(@AuthenticationPrincipal User user) {
-        userService.leaveCurrentGroup(user.getId());
+        //userService.leaveCurrentGroup(user.getId());
         return ResponseEntity.ok("You have successfully left the household group.");
     }
+
+
+
+
 }

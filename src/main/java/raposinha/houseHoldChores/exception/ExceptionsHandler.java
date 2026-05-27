@@ -19,6 +19,7 @@ import raposinha.houseHoldChores.DTO.ExceptionListDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 public class ExceptionsHandler {
@@ -94,6 +95,19 @@ public class ExceptionsHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ExceptionDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         return buildResponse("Database integrity constraint violated. Action rejected.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserAlreadyHasGroupException.class)
+    public ResponseEntity<Object> handleUserAlreadyHasGroupException(UserAlreadyHasGroupException ex) {
+
+        Map<String, Object> errorBody = Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", HttpStatus.CONFLICT.value(),
+                "error", "Conflict",
+                "message", ex.getMessage() // 👈 "Cannot create group: You already belong to a household!"
+        );
+
+        return new ResponseEntity<>(errorBody, HttpStatus.CONFLICT);
     }
 
     // --- FALLBACK GLOBAL EXCEPTION ---

@@ -16,6 +16,7 @@ import raposinha.houseHoldChores.service.UserService;
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final UserService userService;

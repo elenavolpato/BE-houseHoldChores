@@ -78,7 +78,7 @@ public class CategoryService {
                 category.getName(),
                 category.getDescription(),
                 category.getIcon(),
-                category.getColorCode(), 
+                category.getColorCode(),
                 taskDtos
         );
     }

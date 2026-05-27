@@ -18,4 +18,6 @@ public interface UserRepo extends JpaRepository<User, UUID> {
 
     // find all members of a specific house/group
     List<User> findByGroup_Id(Long id);
+
+    List<User> findByGroupId(Long groupId);
 }

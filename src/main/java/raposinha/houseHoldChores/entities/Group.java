@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -36,4 +37,6 @@ public class Group {
     @JsonManagedReference
     @ToString.Exclude
     private List<User> members = new ArrayList<>();
+
+
 }

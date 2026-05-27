@@ -14,6 +14,7 @@ import raposinha.houseHoldChores.entities.enums.GroupRole;
 import raposinha.houseHoldChores.exception.BadRequestException;
 import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.exception.UnauthorizedException;
+import raposinha.houseHoldChores.exception.UserAlreadyHasGroupException;
 import raposinha.houseHoldChores.repositories.GroupRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 
@@ -30,6 +31,10 @@ public class GroupService {
     // create group
     @Transactional
     public GroupResponseDTO create(GroupCreateDTO body, User adminUser) {
+        // a user can only be in one group check
+        if (adminUser.getGroup() != null) {
+            throw new UserAlreadyHasGroupException("Cannot create group: You already belong to a household!");
+        }
 
         // create group entity
         Group newGroup = new Group();
@@ -152,5 +157,5 @@ public class GroupService {
         return userRepo.findByGroup_Id(id);
     }
 
-    // filters by category - see what Giorgia did on the previous project todo
+
 }
