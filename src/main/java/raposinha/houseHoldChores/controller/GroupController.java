@@ -12,6 +12,7 @@ import raposinha.houseHoldChores.DTO.group.GroupCreateDTO;
 import raposinha.houseHoldChores.DTO.group.GroupResponseDTO;
 import raposinha.houseHoldChores.DTO.group.UpdateGroupNameRequestDTO;
 import raposinha.houseHoldChores.DTO.user.MemberOfGroupResponseDTO;
+import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.GroupService;
 import raposinha.houseHoldChores.service.UserService;
@@ -68,6 +69,12 @@ public class GroupController {
     @GetMapping("/{groupId}")
     public List<MemberOfGroupResponseDTO> getAllGroupMembers(@PathVariable("groupId") Long groupId){
         return  groupService.findByGroupId(groupId);
+    }
+
+    // GET /api/groups/find-by-email/:email
+    @GetMapping("/find-by-email/{email}")
+    public Group findGroupByAdminEmail(@PathVariable("email") String email){
+        return  groupService.findGroupByAdminEmail(email);
     }
 
     // DELETE  /api/groups/delete/1

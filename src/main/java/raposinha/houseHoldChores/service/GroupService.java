@@ -158,6 +158,14 @@ public class GroupService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public Group findGroupByAdminEmail(String email){
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
+
+        return groupRepo.findByOwnerEmail(email)
+                .orElseThrow(() -> new NotFoundException("No active group managed by this administrator email."));
+    }
 }
 
 

@@ -13,4 +13,5 @@ import java.util.UUID;
 public interface GroupRepo extends JpaRepository<Group, Long> {
     // find the group owned by a specific admin
     Optional<Group> findByOwnerId(UUID ownerId);
+    Optional<Group> findByOwnerEmail(String Email);
 }
