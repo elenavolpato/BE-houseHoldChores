@@ -43,7 +43,6 @@ public class UserController {
     // GET /api/users/me
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> getMyProfile(@AuthenticationPrincipal User user) {
-        // Wrap the details into a clean DTO so you don't leak the password hash!
         UserProfileResponseDTO profile = userService.getUserProfile(user.getId());
         return ResponseEntity.ok(profile);
     }
@@ -74,7 +73,6 @@ public class UserController {
         //userService.leaveCurrentGroup(user.getId());
         return ResponseEntity.ok("You have successfully left the household group.");
     }
-
 
 
 

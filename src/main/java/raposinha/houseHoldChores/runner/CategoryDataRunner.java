@@ -25,13 +25,13 @@ public class CategoryDataRunner implements CommandLineRunner {
     public void run(String @NonNull ... args) throws Exception {
 
         Map<String, String[]> categoriesToSeed = Map.of(
-                "Cleaning", new String[]{"General house cleaning tasks", "broom", "#E53D00"},
-                "Groceries", new String[]{"Shopping and food supplies", "cart-shopping", "#E53D00"},
-                "Laundry", new String[]{"Washing, drying, and folding", "shirt", "#296EB4 "},
-                "Garden", new String[]{"Outdoor maintenance and plants", "leaf", "#BA324F "},
-                "Bills", new String[]{"Monthly payments and finances", "money-bills", "#8D5A97"},
-                "Kitchen", new String[]{"Cooking, washing dishes, and cleaning", "sink", "#94AE89"},
-                "Pets", new String[]{"Pets care and cleaning", "paw", "#20063B"}
+                "Cleaning", new String[]{"General house cleaning tasks", "broom", "#ec111a"},
+                "Groceries", new String[]{"Shopping and food supplies", "cart-shopping", "#fb6330"},
+                "Laundry", new String[]{"Washing, drying, and folding", "shirt", "#ffd42f "},
+                "Garden", new String[]{"Outdoor maintenance and plants", "leaf", "#138468 "},
+                "Bills", new String[]{"Monthly payments and finances", "money-bills", "#009dd6"},
+                "Kitchen", new String[]{"Cooking, washing dishes, and cleaning", "sink", "#7849b8"},
+                "Pets", new String[]{"Pets care and cleaning", "paw", "#f2609e"}
         );
         categoriesToSeed.forEach((name, details) -> {
             // check if entity is already created

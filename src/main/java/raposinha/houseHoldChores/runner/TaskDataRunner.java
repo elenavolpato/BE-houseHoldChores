@@ -51,19 +51,19 @@ public class TaskDataRunner implements CommandLineRunner {
         CSVParser parser = new CSVParserBuilder().withSeparator(',').withIgnoreQuotations(true).build();
         try (CSVReader reader = new CSVReaderBuilder(new InputStreamReader(inputStream))
                 .withCSVParser(parser)
-                .withSkipLines(1) // Skip the header row
+                .withSkipLines(1)
                 .build()) {
             String[] fields;
 
             while ((fields = reader.readNext()) != null) {
-                // check if line is empty
-                if(fields.length >= 3) {
-                    String[] finalFields = fields;
-                    Category category = categoryRepo.findByName(fields[0])
-                            .orElseThrow(() -> new NotFoundException("Category '" + finalFields[0] + "' was not found."));
-                    String title =  fields[1];
-                    int frequency = Integer.parseInt(fields[2]);
 
+                if (fields.length >= 3) {
+                    String categoryName = fields[0].trim();
+                    String title = fields[1].trim();
+                    int frequency = Integer.parseInt(fields[2].trim());
+
+                    Category category = categoryRepo.findByName(categoryName)
+                            .orElseThrow(() -> new NotFoundException("Category '" + categoryName + "' was not found."));
                     PresetTask t = new PresetTask();
                     t.setCategory(category);
                     t.setTitle(title);

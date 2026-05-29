@@ -23,6 +23,17 @@ public class CategoryService {
     private final CategoryRepo categoryRepo;
     private final PresetTaskRepo presetTaskRepo;
 
+    public List<CategoryResponseDTO> getAllCategories() {
+        return categoryRepo.findAll().stream()
+                .map(category -> new CategoryResponseDTO(
+                        category.getId(),
+                        category.getName(),
+                        category.getDescription(), // Assumes your entity maps this field!
+                        category.getIcon(),
+                        category.getColorCode()
+                ))
+                .toList();
+    }
     public Category createCategory(String name, String desc, String icon, String colorCode) {
         Category c = new Category(name);
         c.setDescription(desc);

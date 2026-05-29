@@ -23,6 +23,33 @@ public class TaskService {
     private TaskRepo taskRepo;
     private CategoryRepo categoryRepo;
 
+
+    public List<PresetTaskSelectionDTO> getAvailablePresetsForUser(User requester) {
+        // the user must belong to a group to query templates
+        if (requester.getGroup() == null) {
+            throw new BadRequestException("You must belong to a household group to view task templates.");
+        }
+        Long groupId = requester.getGroup().getId();
+        List<PresetTask> availablePresets = presetRepo.findGlobalAndByGroupId(groupId);
+
+        return availablePresets.stream()
+                .map(preset -> {
+                    Category category = preset.getCategory(); // Grab Category reference
+
+                    return new PresetTaskSelectionDTO(
+                            preset.getId(),
+                            preset.getTitle(),
+                            preset.getFrequency(),
+                            category != null ? category.getName() : "General",
+                            preset.getGroup() != null,
+                            category != null ? category.getIcon() : "circle-check",
+                            category != null ? category.getColorCode() : "#FFD700"
+                    );
+                })
+                .toList();
+    }
+
+
     @Transactional
     public TaskResponseDTO createTaskFromPreset(CreateTaskFromPresetDTO dto) {
         // fetch presetTask]
@@ -167,13 +194,13 @@ public class TaskService {
             throw new UnauthorizedException("You can only view tasks of members in your own household.");
         }
 
-
         return taskRepo.findByAssignedToId(userId).stream()
                 .map(this::convertToResponseDTO)
                 .toList();
     }
 
     private TaskResponseDTO convertToResponseDTO(Task task) {
+        Category category = task.getCategory();
         return new TaskResponseDTO(
                 task.getId(),
                 task.getTitle(),
@@ -181,7 +208,9 @@ public class TaskService {
                 task.getDueDate(),
                 task.isCompleted(),
                 task.getAssignedTo() != null ? task.getAssignedTo().getUsername() : "Unassigned",
-                task.getFrequency()
+                (task.getFrequency()),
+                category != null ? category.getIcon() : "circle-check", // fallback icon
+                category != null ? category.getColorCode() : "#FFD700"     // fallback color
         );
     }
 

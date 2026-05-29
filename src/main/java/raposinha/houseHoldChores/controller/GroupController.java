@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import raposinha.houseHoldChores.DTO.group.GroupCreateDTO;
 import raposinha.houseHoldChores.DTO.group.GroupResponseDTO;
 import raposinha.houseHoldChores.DTO.group.UpdateGroupNameRequestDTO;
+import raposinha.houseHoldChores.DTO.user.MemberOfGroupResponseDTO;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.GroupService;
 import raposinha.houseHoldChores.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -50,17 +52,21 @@ public class GroupController {
         return ResponseEntity.ok(message);
     }
 
-    // PATCH /api/groups/rename
+    // PATCH /api/groups/{groupId}/rename
     @PatchMapping("/{groupId}/rename")
-    public ResponseEntity<String> changeGroupName (@PathVariable("groupId") Long groupId, @Valid @RequestBody UpdateGroupNameRequestDTO newGroupName){
+    public ResponseEntity<?> changeGroupName (
+            @PathVariable("groupId") Long groupId,
+            @Valid @RequestBody UpdateGroupNameRequestDTO newGroupName
+    ) {
         groupService.updateGroupName(groupId, newGroupName);
-        return ResponseEntity.ok("Group name changed to " + newGroupName.newGroupName());
+
+        return ResponseEntity.ok(Map.of("message", "Group name changed to " + newGroupName.newGroupName()));
     }
 
     // see all groups members
     // GET /api/groups/1
     @GetMapping("/{groupId}")
-    public List<User> findGroupId(@PathVariable("groupId") Long groupId){
+    public List<MemberOfGroupResponseDTO> getAllGroupMembers(@PathVariable("groupId") Long groupId){
         return  groupService.findByGroupId(groupId);
     }
 

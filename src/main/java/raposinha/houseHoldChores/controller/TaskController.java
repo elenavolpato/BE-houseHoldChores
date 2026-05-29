@@ -24,9 +24,17 @@ public class TaskController {
     private final TaskService taskService;
 
     // when a user selects a task from the preset tasks
-    // POST /api/tasks/preset
-    @PostMapping("/preset")
-    public ResponseEntity<TaskResponseDTO> createFromPreset(
+    // GET /api/tasks/presets
+    @GetMapping("/presets")
+    public ResponseEntity<List<PresetTaskSelectionDTO>> getAvailablePresets(@AuthenticationPrincipal User user) {
+        List<PresetTaskSelectionDTO> presets = taskService.getAvailablePresetsForUser(user);
+        return ResponseEntity.ok(presets);
+    }
+
+
+    // POST /api/tasks/create-from-preset
+    @PostMapping("/create-from-preset")
+    public ResponseEntity<TaskResponseDTO> createTaskFromPreset(
             @Valid @RequestBody CreateTaskFromPresetDTO request) {
         TaskResponseDTO response = taskService.createTaskFromPreset(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -34,8 +42,8 @@ public class TaskController {
 
     // when a user types in their own custom chore
     // POST /api/tasks/personalized
-    @PostMapping("/personalized")
-    public ResponseEntity<TaskResponseDTO> createPersonalized(
+    @PostMapping("/create-task")
+    public ResponseEntity<TaskResponseDTO> createPersonalizedTask(
             @Valid @RequestBody CreatePersonalizedTaskRequestDTO request) {
         TaskResponseDTO response = taskService.createPersonalizedTask(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

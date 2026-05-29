@@ -20,6 +20,7 @@ import raposinha.houseHoldChores.repositories.UserRepo;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -133,29 +134,30 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupResponseDTO updateGroupName(Long groupId, UpdateGroupNameRequestDTO dto) {
+    public String updateGroupName(Long groupId, UpdateGroupNameRequestDTO dto) {
         Group group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new NotFoundException("Household group not found with ID: " + groupId));
 
         group.setGroupName(dto.newGroupName());
-
-        List<MemberOfGroupResponseDTO> memberDtos = group.getMembers().stream()
-                .map(user -> new MemberOfGroupResponseDTO(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getGroup().getId()
-                ))
-                .toList();
-
-        return new GroupResponseDTO(group.getId(), group.getGroupName(), group.getOwner().getId(), memberDtos);
+        return "Group name has been changed to " + dto.newGroupName();
     }
 
-    public List<User> findByGroupId(Long id) {
+    public List<MemberOfGroupResponseDTO> findByGroupId(Long id) {
+        List<User> members = userRepo.findByGroup_Id(id);
         if (!groupRepo.existsById(id)) {
             throw new NotFoundException("Group with ID " + id + " not found");
         }
-        return userRepo.findByGroup_Id(id);
+        return members.stream()
+                .map(user -> new MemberOfGroupResponseDTO(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getAvatarUrl(),
+                        user.getGroup(),
+                        user.getRole(),
+                        user.getEmail()
+                ))
+                .collect(Collectors.toList());
     }
-
-
 }
+
+

@@ -17,7 +17,7 @@ import raposinha.houseHoldChores.service.CategoryService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/categories")
 @AllArgsConstructor
 @Validated
 public class CategoryController {
@@ -40,5 +40,12 @@ public class CategoryController {
             @AuthenticationPrincipal User user){
         CategoryWithTasksResponseDTO res = categoryService.getCategoryWithTasks(name, user);
         return ResponseEntity.ok(res);
+    }
+
+    // GET /api/categories
+    @GetMapping
+    public ResponseEntity<List<CategoryResponseDTO>> getCategories() {
+        List<CategoryResponseDTO> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
     }
 }

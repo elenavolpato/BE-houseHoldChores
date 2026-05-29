@@ -16,5 +16,8 @@ public interface PresetTaskRepo extends JpaRepository<PresetTask, Long> {
             @Param("categoryId") Long categoryId,
             @Param("groupId") Long groupId
     );
+    // Fetches global rows (null group) + custom household rows side-by-side
+    @Query("SELECT p FROM PresetTask p WHERE p.group IS NULL OR p.group.id = :groupId")
+    List<PresetTask> findGlobalAndByGroupId(@Param("groupId") Long groupId);
 
 }

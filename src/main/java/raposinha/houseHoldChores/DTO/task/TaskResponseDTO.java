@@ -9,5 +9,7 @@ public record TaskResponseDTO(
         LocalDateTime dueDate,
         boolean isCompleted,
         String assignedTo,
-        int frequency
+        int frequency,
+        String icon,
+        String colorCode
 ) {}

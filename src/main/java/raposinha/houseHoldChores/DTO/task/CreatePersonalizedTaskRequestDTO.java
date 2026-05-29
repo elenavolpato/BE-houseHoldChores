@@ -19,7 +19,7 @@ public class CreatePersonalizedTaskRequestDTO {
 
     private UUID assignedUserId;
 
-    @NotBlank(message = "Group ID is required")
+    @NotNull(message = "Group ID is required")
     private Long groupId;
 
     @NotNull(message = "Due date is required")
