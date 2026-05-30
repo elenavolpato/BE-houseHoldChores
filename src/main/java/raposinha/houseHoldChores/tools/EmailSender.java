@@ -62,21 +62,21 @@ public class EmailSender {
 
 
     //invite someone to app email
-    public void sendInvitationEmail(User inviter, String recipientEmail, String recipientName){
+    public void sendInvitationEmail(User inviter, String recipientEmail, String recipientName, String url){
         String htmlContent = """
-           <html>
-            <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-                <h1 style="color: #4A90E2;">You've been invited to the HouseHold Chores app!</h1>
-                <p>Hello <strong>%s</strong>,</p>
-                <p><strong>%s</strong> has invited you to join their household. Start organizing your home together by checking your assigned tasks.</p>
-                <br>
-                <a href="https://raposinha.dev" 
-                   style="background-color: #4A90E2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
-                   Download the app
-                </a>
-            </td>
-        </html>
-        """.formatted(recipientName, inviter.getUsername());
+       <html>
+        <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+            <h1 style="color: #4A90E2;">You've been invited to the HouseHold Chores app!</h1>
+            <p>Hello <strong>%s</strong>,</p>
+            <p><strong>%s</strong> has invited you to join their household. Start organizing your home together by checking your assigned tasks.</p>
+            <br>
+            <a href="%s" 
+               style="background-color: #4A90E2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+               Join the Household Group
+            </a>
+        </body>
+    </html>
+    """.formatted(recipientName, inviter.getUsername(), url); // 🚀 Added 'url' variable tracking here
 
         HttpResponse<String> response = Unirest.post(
                         "https://api.mailgun.net/v3/" + domainName + "/messages")
@@ -84,7 +84,7 @@ public class EmailSender {
                 .field("from", "Household Chores App <invite@" + domainName + ">")
                 .field("to", recipientEmail)
                 .field("subject", "Invitation to Household Chores APP")
-                .field("text", "Welcome " + recipientName + "!")
+                .field("text", "Welcome " + recipientName + "! Join here: " + url)
                 .field("html", htmlContent)
                 .asString();
 

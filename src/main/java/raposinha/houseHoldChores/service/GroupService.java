@@ -62,7 +62,7 @@ public class GroupService {
     public String addUserToGroup(Long groupId, UUID userId, UUID requesterId){
         // fetch user
         User member = userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User to remove not found"));
+                .orElseThrow(() -> new NotFoundException("User to de added not found"));
         User requester = userRepo.findById(requesterId)
                 .orElseThrow(() -> new NotFoundException("Requester not found"));
 
@@ -70,6 +70,8 @@ public class GroupService {
         Group group = groupRepo.findById(groupId).orElseThrow(() -> new NotFoundException("Group  with id " + groupId + " not found."));
 
         // if requester is not admin of group, it cannot add a member
+        System.out.println("--------------"+requesterId);
+        System.out.println("+++++++++++++++"+group.getOwner().getId());
         if(!requesterId.equals(group.getOwner().getId())){ throw new UnauthorizedException("Only a group admin can add a member to the group");}
         member.setGroup(group);
 

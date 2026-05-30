@@ -1,12 +1,15 @@
 package raposinha.houseHoldChores.service;
 
 
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import raposinha.houseHoldChores.DTO.user.LoginRequestDTO;
 import raposinha.houseHoldChores.DTO.user.LoginResponseDTO;
 import raposinha.houseHoldChores.entities.User;
+import raposinha.houseHoldChores.entities.enums.GroupRole;
 import raposinha.houseHoldChores.exception.UnauthorizedException;
+import raposinha.houseHoldChores.exception.UserAlreadyExistsException;
 import raposinha.houseHoldChores.repositories.UserRepo;
 import raposinha.houseHoldChores.security.TokenTools;
 
@@ -34,6 +37,5 @@ public class AuthService {
         String token = tokenTools.createToken(user);
         return new LoginResponseDTO(token, user.getUsername(), user.getAvatarUrl());
     }
-
 
 }

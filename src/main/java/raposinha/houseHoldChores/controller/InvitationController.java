@@ -1,7 +1,7 @@
 package raposinha.houseHoldChores.controller;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -13,20 +13,29 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/invitations")
-@AllArgsConstructor
 public class InvitationController {
 
     private final InvitationService invitationService;
+    private final String frontendBaseUrl;
 
-    // POST /api/invitations/send
+    public InvitationController(
+            InvitationService invitationService,
+            @Value("${app.frontend.url}") String frontendBaseUrl) {
+        this.invitationService = invitationService;
+        this.frontendBaseUrl = frontendBaseUrl;
+    }
+
     @PostMapping("/send")
     public ResponseEntity<Map<String, String>> sendInvitation(
             @Valid @RequestBody SendInvitationEmailDTO dto,
             @AuthenticationPrincipal User inviter) {
 
-        invitationService.processAndSendInvitation(inviter, dto);
+        // 🚀 Clean hand-off to service layer with the injected base configuration URL
+        invitationService.processAndSendInvitation(inviter, dto, this.frontendBaseUrl);
+
         return ResponseEntity.ok(Map.of(
                 "message", "Invitation email successfully sent via Mailgun to " + dto.recipientEmail()
         ));
     }
 }
+

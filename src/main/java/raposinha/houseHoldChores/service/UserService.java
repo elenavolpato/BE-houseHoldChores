@@ -28,7 +28,7 @@ public class UserService {
     //private final GroupRepo groupRepo;
 
     @Transactional
-    public UserRegistrationResponseDTO save(UserRegistrationRequestDTO body){
+    public User save(UserRegistrationRequestDTO body){
         System.out.println("DEBUG: Save method started for email: " + body.getEmail());
         // check if email is already in use
         if(this.userRepo.existsByEmail(body.getEmail()))
@@ -53,7 +53,7 @@ public class UserService {
         } catch (Exception e) {
             System.err.println("CRITICAL: User created but email failed: " + e.getMessage());
         }
-        return new UserRegistrationResponseDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail(), savedUser.getAvatarUrl(), null);
+        return savedUser;
     }
 
     @Transactional
