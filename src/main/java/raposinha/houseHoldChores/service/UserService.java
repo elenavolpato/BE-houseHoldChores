@@ -9,11 +9,15 @@ import raposinha.houseHoldChores.DTO.user.UpdateProfileRequestDTO;
 import raposinha.houseHoldChores.DTO.user.UserProfileResponseDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationRequestDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
+import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.User;
+import raposinha.houseHoldChores.entities.enums.GroupRole;
 import raposinha.houseHoldChores.exception.BadRequestException;
 import raposinha.houseHoldChores.exception.EmailAlreadyExistsException;
 import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.repositories.GroupRepo;
+import raposinha.houseHoldChores.repositories.InvitationRepo;
+import raposinha.houseHoldChores.repositories.TaskRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 import raposinha.houseHoldChores.tools.EmailSender;
 
@@ -25,7 +29,9 @@ public class UserService {
     private final UserRepo userRepo;
     private final EmailSender emailSender;
     private final PasswordEncoder passwordEncoder;
-    //private final GroupRepo groupRepo;
+    private final InvitationRepo invitationRepo;
+    private final TaskRepo taskRepo;
+    private final GroupRepo groupRepo;
 
     @Transactional
     public User save(UserRegistrationRequestDTO body){
@@ -110,5 +116,42 @@ public class UserService {
                 user.getGroup() != null ? user.getGroup().getGroupName() : null,
                 user.getRole()
         );
+    }
+
+    @Transactional
+    public void deleteUserAccount(UUID userId, UUID successorId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        // cleans invitations and unassigns tasks
+        taskRepo.unassignTasksByUserId(userId);
+        invitationRepo.deleteByInviterId(userId);
+        invitationRepo.deleteByRecipientEmail(user.getEmail());
+
+        // Force database to clear task/invitation rows immediately
+        userRepo.flush();
+
+        //  Handle Group Ownership Transition if they own a group
+        Group ownedGroup = groupRepo.findByOwnerId(userId).orElse(null);
+
+        if (ownedGroup != null) {
+            if (successorId != null) {
+                User successor = userRepo.findById(successorId)
+                        .orElseThrow(() -> new NotFoundException("Chosen successor user not found."));
+
+                // Pass the torch on the group entity
+                ownedGroup.setOwner(successor);
+                groupRepo.saveAndFlush(ownedGroup);
+
+                // Update role attributes on the successor
+                successor.setRole(GroupRole.ADMIN);
+                userRepo.saveAndFlush(successor);
+            } else {
+                // No successor provided means they are the last member. Delete the entire group layout.
+                groupRepo.delete(ownedGroup);
+                groupRepo.flush();
+            }
+        }
+        userRepo.delete(user);
     }
 }

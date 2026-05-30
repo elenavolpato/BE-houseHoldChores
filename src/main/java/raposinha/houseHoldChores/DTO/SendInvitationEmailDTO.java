@@ -10,4 +10,5 @@ public record SendInvitationEmailDTO(
         @NotBlank(message = "Email is required")
         @Email(message = "Invalid email format")
         String recipientEmail
+
 ) {}

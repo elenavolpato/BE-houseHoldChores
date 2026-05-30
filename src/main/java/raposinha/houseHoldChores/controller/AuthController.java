@@ -12,6 +12,7 @@ import raposinha.houseHoldChores.DTO.user.LoginRequestDTO;
 import raposinha.houseHoldChores.DTO.user.LoginResponseDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationRequestDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
+import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.Invitation;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.AuthService;
@@ -64,16 +65,14 @@ public class AuthController {
                 dto.password()
         );
 
-        // 3. 🚀 REUSE EXISTING LOGIC: Hand off to your UserService to create the user and send the email
         User newlyRegisteredUser = userService.save(registrationRequest);
-        System.out.println("hahahaha --->" +newlyRegisteredUser);
-        // 4. Automatically bond this brand-new user to the household group
+        // automatically bond this brand-new user to the household group
         groupService.addUserToGroup( invitation.getGroupId(),newlyRegisteredUser.getId(), invitation.getInviterId());
 
-        // 5. Invalidate the invitation link so it can't be recycled
+        //invalidate the invitation link so it can't be recycled
         invitationService.expireToken(dto.token());
 
-        // 6. Return your standard client response DTO cleanly
+        // return standard client response DTO
         UserRegistrationResponseDTO response = new UserRegistrationResponseDTO(
                 newlyRegisteredUser.getId(),
                 newlyRegisteredUser.getUsername(),
@@ -81,8 +80,6 @@ public class AuthController {
                 newlyRegisteredUser.getAvatarUrl(),
                 null
         );
-
         return ResponseEntity.ok(response);
     }
-
 }

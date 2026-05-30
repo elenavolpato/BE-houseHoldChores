@@ -20,4 +20,5 @@ public interface UserRepo extends JpaRepository<User, UUID> {
     List<User> findByGroup_Id(Long id);
 
     List<User> findByGroupId(Long groupId);
+
 }

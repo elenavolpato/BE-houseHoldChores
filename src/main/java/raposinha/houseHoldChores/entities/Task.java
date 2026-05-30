@@ -44,8 +44,8 @@ public class Task {
     @JoinColumn(name="group_id")
     private Group group;
 
-    @ManyToOne
-    @JoinColumn(name = "assigned_to")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_to", nullable = true)
     private User assignedTo;
 
     @Column(name = "is_completed")

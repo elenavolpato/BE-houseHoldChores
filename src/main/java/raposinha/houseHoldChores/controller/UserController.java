@@ -1,5 +1,6 @@
 package raposinha.houseHoldChores.controller;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,11 +68,16 @@ public class UserController {
         return ResponseEntity.ok("Successfully joined the household group!");
     }
 
-    // DELETE /api/users/group/leave
-    @DeleteMapping("/group/leave")
-    public ResponseEntity<String> leaveGroup(@AuthenticationPrincipal User user) {
-        //userService.leaveCurrentGroup(user.getId());
-        return ResponseEntity.ok("You have successfully left the household group.");
+    // DELETE /api/users/delete
+    @DeleteMapping("/delete")
+    @Transactional // 🚀 Ensures database changes commit cleanly
+    public ResponseEntity<Map<String, String>> deleteAccount(@AuthenticationPrincipal User user, UUID successorId) {
+
+        userService.deleteUserAccount(user.getId(), successorId);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Your account has been successfully and permanently deleted."
+        ));
     }
 
 
