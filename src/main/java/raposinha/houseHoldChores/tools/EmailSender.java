@@ -103,4 +103,43 @@ public class EmailSender {
         );
 
     }
+    // forgot password email
+    public void sendPasswordResetEmail(String recipientEmail, String recipientName, String resetLink) {
+        String htmlContent = """
+        <html>
+            <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+                <h1 style="color: #4A90E2;">Password Reset Request</h1>
+                <p>Hello <strong>%s</strong>,</p>
+                <p>We received a request to reset your password. Click the button below to choose a new one.</p>
+                <p>This link is valid for <strong>15 minutes</strong>. If you didn't request this, you can safely ignore this email.</p>
+                <br>
+                <a href="%s"
+                   style="background-color: #4A90E2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                   Reset My Password
+                </a>
+                <br><br>
+                <p style="font-size: 12px; color: #999;">If the button doesn't work, copy and paste this link into your browser:<br>%s</p>
+            </body>
+        </html>
+        """.formatted(recipientName, resetLink, resetLink);
+
+        HttpResponse<String> response = Unirest.post(
+                        "https://api.mailgun.net/v3/" + domainName + "/messages")
+                .basicAuth("api", apiKey)
+                .field("from", "Household Chores App <noreply@" + domainName + ">")
+                .field("to", recipientEmail)
+                .field("subject", "Reset your Household Chores password")
+                .field("text", "Hello " + recipientName + ", reset your password here: " + resetLink)
+                .field("html", htmlContent)
+                .asString();
+
+        System.out.println(response.getStatus() + domainName);
+        System.out.println(response.getBody());
+
+        if (response.getStatus() != 200) {
+            throw new RuntimeException(
+                    "Failed to send password reset email: " + response.getBody()
+            );
+        }
+    }
 }

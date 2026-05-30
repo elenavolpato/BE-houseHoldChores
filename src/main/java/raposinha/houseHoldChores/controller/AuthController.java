@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import raposinha.houseHoldChores.DTO.RegisterWithInviteDTO;
+import raposinha.houseHoldChores.DTO.password.ForgotPasswordRequest;
+import raposinha.houseHoldChores.DTO.password.ResetPasswordRequest;
 import raposinha.houseHoldChores.DTO.user.LoginRequestDTO;
 import raposinha.houseHoldChores.DTO.user.LoginResponseDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationRequestDTO;
@@ -15,10 +17,7 @@ import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
 import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.Invitation;
 import raposinha.houseHoldChores.entities.User;
-import raposinha.houseHoldChores.service.AuthService;
-import raposinha.houseHoldChores.service.GroupService;
-import raposinha.houseHoldChores.service.InvitationService;
-import raposinha.houseHoldChores.service.UserService;
+import raposinha.houseHoldChores.service.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,6 +29,7 @@ public class AuthController {
     private final AuthService authService;
     private final GroupService groupService;
     private final InvitationService invitationService;
+    private final PasswordResetService passwordResetService;
 
     // POST /api/auth/register
     @PostMapping("/register")
@@ -81,5 +81,20 @@ public class AuthController {
                 null
         );
         return ResponseEntity.ok(response);
+    }
+
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        passwordResetService.processForgotPassword(request);
+        // Always return 200 regardless of whether email exists
+        return ResponseEntity.ok("If that email is registered, a reset link has been sent.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        passwordResetService.resetPassword(request);
+        return ResponseEntity.ok("Password reset successfully.");
     }
 }
