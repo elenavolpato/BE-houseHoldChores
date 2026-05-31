@@ -15,7 +15,7 @@ import java.util.UUID;
 public interface TaskRepo extends JpaRepository<Task, Long> {
 
     // weekly calendar: fetches all tasks for a group between two dates
-    List<Task> findByAssignedToGroup_IdAndDueDateBetween(Long groupId, LocalDateTime start, LocalDateTime end);
+    List<Task> findByGroup_IdAndDueDateBetween(Long groupId, LocalDateTime start, LocalDateTime end);
 
     // only the tasks assigned to a specific person
     List<Task> findByAssignedToId(UUID userId);
@@ -26,4 +26,5 @@ public interface TaskRepo extends JpaRepository<Task, Long> {
     @Modifying // Required for queries modifying the database state
     @Query("UPDATE Task t SET t.assignedTo = null WHERE t.assignedTo.id = :userId")
     void unassignTasksByUserId(@Param("userId") UUID userId);
+    List<Task> findByGroupId(UUID groupId);
 }

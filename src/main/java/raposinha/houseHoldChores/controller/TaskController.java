@@ -35,8 +35,10 @@ public class TaskController {
     // POST /api/tasks/create-from-preset
     @PostMapping("/create-from-preset")
     public ResponseEntity<TaskResponseDTO> createTaskFromPreset(
-            @Valid @RequestBody CreateTaskFromPresetDTO request) {
-        TaskResponseDTO response = taskService.createTaskFromPreset(request);
+            @Valid @RequestBody CreateTaskFromPresetDTO request,
+            @AuthenticationPrincipal User user) { // 👈 Grab session context here
+
+        TaskResponseDTO response = taskService.createTaskFromPreset(request, user);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -95,4 +97,14 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getTasksAssignedToUser(userId, requester));
     }
 
+    // GET /api/tasks/group/week
+    @GetMapping("/group/week")
+    public ResponseEntity<List<TaskResponseDTO>> getTasksByGroupAndRange(
+            @AuthenticationPrincipal User user,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime start,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime end) {
+
+        List<TaskResponseDTO> tasks = taskService.getTasksByGroupAndRange(user, start, end);
+        return ResponseEntity.ok(tasks);
+    }
 }

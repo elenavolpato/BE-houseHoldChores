@@ -25,7 +25,7 @@ public class PasswordResetService {
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
 
-    private static final long EXPIRY_MINUTES = 15;
+    private static final long EXPIRY_MINUTES = 30;
 
     public void processForgotPassword(ForgotPasswordRequest request) {
         userRepository.findByEmail(request.email()).ifPresent(user -> {

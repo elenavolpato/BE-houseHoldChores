@@ -10,6 +10,11 @@ import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.exception.UnauthorizedException;
 import raposinha.houseHoldChores.repositories.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,23 +54,35 @@ public class TaskService {
                 .toList();
     }
 
-
     @Transactional
-    public TaskResponseDTO createTaskFromPreset(CreateTaskFromPresetDTO dto) {
-        // fetch presetTask]
+    public TaskResponseDTO createTaskFromPreset(CreateTaskFromPresetDTO dto, User loggedInUser) {
+        // fetch presetTask
+        if (dto.presetId() == null) {
+            throw new BadRequestException("Preset ID must not be null.");
+        }
         PresetTask preset = presetRepo.findById(dto.presetId())
                 .orElseThrow(() -> new NotFoundException("Preset task not found"));
 
-        // fetch User and Group
-        User assignedUser = userRepo.findById(dto.assignedUserId()).orElseThrow();
-        Group group = groupRepo.findById(dto.groupId()).orElseThrow();
+        // resolve Group securely using the logged-in user's profile
+        if (loggedInUser.getGroup() == null) {
+            throw new BadRequestException("You must belong to a household group to create chores.");
+        }
+        Group group = loggedInUser.getGroup(); // No extra DB lookup required!
 
-        // create "Live" Task and copy data from the Preset
+        // only lookup if a non-null ID is provided
+        User assignedUser = null;
+        if (dto.assignedUserId() != null) {
+            assignedUser = userRepo.findById(dto.assignedUserId())
+                    .orElseThrow(() -> new NotFoundException("Assigned user not found"));
+        } else {
+            // Fallback: Assign it to the creator if no user ID was provided in the payload
+            assignedUser = loggedInUser;
+        }
+
+        // 4. Create and map the live Task layout
         Task newTask = new Task();
         newTask.setTitle(preset.getTitle());
         newTask.setCategory(preset.getCategory());
-
-        // if user passed a custom frequency, use it. otherwise, use the preset one
         newTask.setFrequency(dto.frequency() > 0 ? dto.frequency() : preset.getFrequency());
 
         newTask.setAssignedTo(assignedUser);
@@ -74,7 +91,6 @@ public class TaskService {
         newTask.setCompleted(false);
 
         Task savedTask = taskRepo.save(newTask);
-
         return convertToResponseDTO(savedTask);
     }
 
@@ -110,8 +126,6 @@ public class TaskService {
 
         return convertToResponseDTO(taskRepo.save(task));
     }
-
-
 
     public String assignUserToTask(UUID userToAssign, Long taskId, User requester) {
         //  find task
@@ -196,6 +210,23 @@ public class TaskService {
 
         return taskRepo.findByAssignedToId(userId).stream()
                 .map(this::convertToResponseDTO)
+                .toList();
+    }
+
+
+    public List<TaskResponseDTO> getTasksByGroupAndRange(User user, java.time.LocalDateTime start, java.time.LocalDateTime end) {
+        System.out.println(user.getGroup()+ "------------------------");
+        if (user.getGroup() == null) {
+            throw new BadRequestException("You do not belong to any household group.");
+        }
+
+        Long groupId = user.getGroup().getId();
+        System.out.println(groupId);
+
+        List<Task> tasks = taskRepo.findByGroup_IdAndDueDateBetween(groupId, start, end);
+
+        return tasks.stream()
+                .map(this::convertToResponseDTO) // Your internal DTO mapper helper
                 .toList();
     }
 

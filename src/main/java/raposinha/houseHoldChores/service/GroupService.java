@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import raposinha.houseHoldChores.DTO.group.GroupCreateDTO;
 import raposinha.houseHoldChores.DTO.group.GroupResponseDTO;
 import raposinha.houseHoldChores.DTO.group.UpdateGroupNameRequestDTO;
+import raposinha.houseHoldChores.DTO.task.TaskResponseDTO;
 import raposinha.houseHoldChores.DTO.user.MemberOfGroupResponseDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
 import raposinha.houseHoldChores.entities.Group;
+import raposinha.houseHoldChores.entities.Task;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.entities.enums.GroupRole;
 import raposinha.houseHoldChores.exception.BadRequestException;
@@ -16,6 +18,7 @@ import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.exception.UnauthorizedException;
 import raposinha.houseHoldChores.exception.UserAlreadyHasGroupException;
 import raposinha.houseHoldChores.repositories.GroupRepo;
+import raposinha.houseHoldChores.repositories.TaskRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 
 import java.util.List;
@@ -27,7 +30,8 @@ import java.util.stream.Collectors;
 public class GroupService {
     private final GroupRepo groupRepo;
     private final UserRepo userRepo;
-    private UserService userService;
+    private final TaskRepo taskrepo;
+    private final UserService userService;
 
     // create group
     @Transactional
