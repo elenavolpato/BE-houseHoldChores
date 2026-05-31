@@ -11,9 +11,8 @@ public class ValidationExceptions extends RuntimeException {
     }
 
     public ValidationExceptions(List<String> errors) {
-        super("Errori di validazione");
+        super("Validation error");
         this.errors = errors;
-        System.out.println("--------------" + errors);
     }
 
     public List<String> getErrors() {

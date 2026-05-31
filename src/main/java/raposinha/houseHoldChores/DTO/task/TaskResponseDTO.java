@@ -1,5 +1,6 @@
 package raposinha.houseHoldChores.DTO.task;
 
+import raposinha.houseHoldChores.entities.User;
 import java.time.LocalDateTime;
 
 public record TaskResponseDTO(
@@ -11,5 +12,7 @@ public record TaskResponseDTO(
         String assignedTo,
         int frequency,
         String icon,
-        String colorCode
+        String colorCode,
+        String avatarUrl
+
 ) {}

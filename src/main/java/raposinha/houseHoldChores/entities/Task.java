@@ -50,4 +50,9 @@ public class Task {
 
     @Column(name = "is_completed")
     private boolean isCompleted;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+
 }

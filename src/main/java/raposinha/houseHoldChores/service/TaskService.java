@@ -215,7 +215,6 @@ public class TaskService {
 
 
     public List<TaskResponseDTO> getTasksByGroupAndRange(User user, java.time.LocalDateTime start, java.time.LocalDateTime end) {
-        System.out.println(user.getGroup()+ "------------------------");
         if (user.getGroup() == null) {
             throw new BadRequestException("You do not belong to any household group.");
         }
@@ -232,6 +231,7 @@ public class TaskService {
 
     private TaskResponseDTO convertToResponseDTO(Task task) {
         Category category = task.getCategory();
+        User assignedUser = task.getAssignedTo();
         return new TaskResponseDTO(
                 task.getId(),
                 task.getTitle(),
@@ -241,7 +241,9 @@ public class TaskService {
                 task.getAssignedTo() != null ? task.getAssignedTo().getUsername() : "Unassigned",
                 (task.getFrequency()),
                 category != null ? category.getIcon() : "circle-check", // fallback icon
-                category != null ? category.getColorCode() : "#FFD700"     // fallback color
+                category != null ? category.getColorCode() : "#FFD700",
+                assignedUser != null ? assignedUser.getAvatarUrl() : "https://res.cloudinary.com/dga90puif/image/upload/q_auto/f_auto/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png"// fallback avatar
+
         );
     }
 
