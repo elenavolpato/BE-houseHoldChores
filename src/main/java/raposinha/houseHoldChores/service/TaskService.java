@@ -195,7 +195,7 @@ public class TaskService {
             throw new UnauthorizedException("You do not belong to this household group.");
         }
 
-        task.setCompleted(true);
+        task.setCompleted(!task.isCompleted());
         return convertToResponseDTO(taskRepo.save(task));
     }
 
