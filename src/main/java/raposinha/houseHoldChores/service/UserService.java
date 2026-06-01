@@ -1,10 +1,13 @@
 package raposinha.houseHoldChores.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import raposinha.houseHoldChores.DTO.user.UpdateProfileRequestDTO;
 import raposinha.houseHoldChores.DTO.user.UserProfileResponseDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationRequestDTO;
@@ -21,6 +24,9 @@ import raposinha.houseHoldChores.repositories.TaskRepo;
 import raposinha.houseHoldChores.repositories.UserRepo;
 import raposinha.houseHoldChores.tools.EmailSender;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -32,6 +38,7 @@ public class UserService {
     private final InvitationRepo invitationRepo;
     private final TaskRepo taskRepo;
     private final GroupRepo groupRepo;
+    private final Cloudinary cloudinary;
 
     @Transactional
     public User save(UserRegistrationRequestDTO body){
@@ -63,13 +70,23 @@ public class UserService {
     }
 
     @Transactional
-    public String changeAvatarUrl(UUID id, String avatarUrl) {
+    public String changeAvatarUrl(UUID id, MultipartFile file) {
         User found = userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " was not found"));
 
-        found.setAvatarUrl(avatarUrl);
-        return "Avatar changed successfully.";
+        Map uploadResult;
+        try {
+            uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                    ObjectUtils.asMap("public_id", "user/" + id));
+        } catch (IOException e) {
+            throw new RuntimeException("Cloudinary upload failed", e);
+        }
+        String url = (String) uploadResult.get("secure_url");
+        found.setAvatarUrl(url);
+        this.userRepo.save(found);
+        return url;
     }
+
 
     public User findById(UUID id) {
         return userRepo.findById(id)

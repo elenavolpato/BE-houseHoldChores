@@ -3,21 +3,18 @@ package raposinha.houseHoldChores.controller;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import raposinha.houseHoldChores.DTO.group.GroupResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 import raposinha.houseHoldChores.DTO.user.*;
-import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.User;
-import raposinha.houseHoldChores.repositories.GroupRepo;
-import raposinha.houseHoldChores.repositories.UserRepo;
+
 import raposinha.houseHoldChores.service.GroupService;
 import raposinha.houseHoldChores.service.UserService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,13 +29,13 @@ public class UserController {
 
     // update avatar
     // PATCH /api/users/avatar
-    @PatchMapping("/avatar")
-    public ResponseEntity<String> changeAvatar(
-            @AuthenticationPrincipal User user,
-            @Valid @RequestBody UpdateAvatarRequestDTO dto) { // 👈 Strong typed validation
+    @PatchMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> uploadAvatar(
+            @PathVariable UUID id,
+            @RequestParam("file") MultipartFile file) {
 
-        String message = userService.changeAvatarUrl(user.getId(), dto.avatarUrl());
-        return ResponseEntity.ok(message);
+        String updatedAvatarUrl = userService.changeAvatarUrl(id, file);
+        return ResponseEntity.ok(Map.of("avatarUrl", updatedAvatarUrl));
     }
 
     // GET /api/users/me
