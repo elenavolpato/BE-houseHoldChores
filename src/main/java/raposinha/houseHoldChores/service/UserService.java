@@ -136,6 +136,34 @@ public class UserService {
     }
 
     @Transactional
+    public UserProfileResponseDTO updateMyUsername(UUID userId, String newUsername) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        user.setUsername(newUsername);
+        userRepo.save(user);
+
+        return getUserProfile(userId);
+    }
+
+    @Transactional
+    public UserProfileResponseDTO updateMyEmail(UUID userId, String newEmail) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        // Optional: Add a uniqueness check if your architecture requires it
+        if (userRepo.existsByEmail(newEmail)) {
+            throw new BadRequestException("Email address is already in use");
+        }
+
+        user.setEmail(newEmail);
+        userRepo.save(user);
+
+        return getUserProfile(userId);
+    }
+
+
+    @Transactional
     public void deleteUserAccount(UUID userId, UUID successorId) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));

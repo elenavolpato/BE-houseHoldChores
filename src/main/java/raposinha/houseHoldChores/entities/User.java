@@ -55,7 +55,7 @@ public class User {
         this.email = email;
         this.password = password;
         // TODO: image will come from the frontend using the api directly there with a set of preset images. user will not be able to upload an image.
-        this.avatarUrl = "https://res.cloudinary.com/dga90puif/image/upload/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png";
+        this.avatarUrl = null;
         this.role = GroupRole.USER;
     }
 

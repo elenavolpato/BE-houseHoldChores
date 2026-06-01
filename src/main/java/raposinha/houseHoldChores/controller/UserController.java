@@ -44,9 +44,28 @@ public class UserController {
         UserProfileResponseDTO profile = userService.getUserProfile(user.getId());
         return ResponseEntity.ok(profile);
     }
+    // PATCH /api/users/me/username
+    @PatchMapping("/me/username")
+    public ResponseEntity<UserProfileResponseDTO> updateUsername(
+            @AuthenticationPrincipal User currentUser,
+            @Valid @RequestBody UpdateUsernameRequest request) {
 
-    // PUT /api/users/profile
-    @PutMapping("/profile")
+        UserProfileResponseDTO updatedProfile = userService.updateMyUsername(currentUser.getId(), request.username());
+        return ResponseEntity.ok(updatedProfile);
+    }
+
+    // PATCH /api/users/me/email
+    @PatchMapping("/me/email")
+    public ResponseEntity<UserProfileResponseDTO> updateEmail(
+            @AuthenticationPrincipal User currentUser,
+            @Valid @RequestBody UpdateEmailRequest request) {
+
+        UserProfileResponseDTO updatedProfile = userService.updateMyEmail(currentUser.getId(), request.email());
+        return ResponseEntity.ok(updatedProfile);
+    }
+
+    // PUT /api/users/update-profile
+    @PutMapping("/update-profile")
     public ResponseEntity<UserProfileResponseDTO> updateProfile(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody UpdateProfileRequestDTO dto) {
