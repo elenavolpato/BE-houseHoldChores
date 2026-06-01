@@ -1,23 +1,22 @@
 package raposinha.houseHoldChores.security;
 
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import raposinha.houseHoldChores.entities.User;
+import raposinha.houseHoldChores.exception.ForbiddenException;
 import raposinha.houseHoldChores.exception.UnauthorizedException;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
 @Component
 public class TokenTools {
 
-    protected final int duration = 1000 * 60 * 60 * 24 * 7;
+    protected final int duration = 1000 * 60 * 60 * 12; // 12 hours
     private final String secret;
 
     public TokenTools(@Value("${jwt.secret}") String secret) {
@@ -36,9 +35,14 @@ public class TokenTools {
 
     public void verifyToken(String token) {
         try {
-            Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parse(token);
+            Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                    .build()
+                    .parse(token);
+        } catch (ExpiredJwtException ex) {
+            throw new UnauthorizedException("Your session has expired. Please log in again."); // → 401
         } catch (Exception ex) {
-            throw new UnauthorizedException("There was a problem with the token. Please try to login again.");
+            throw new ForbiddenException("Invalid token."); // → 403
         }
     }
 

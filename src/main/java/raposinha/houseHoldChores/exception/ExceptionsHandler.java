@@ -81,6 +81,10 @@ public class ExceptionsHandler {
     public ResponseEntity<ExceptionDTO> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
         return buildResponse("Access denied: You do not have the required permissions.", HttpStatus.FORBIDDEN);
     }
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<String> handleForbidden(ForbiddenException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage()); // 403
+    }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ExceptionDTO> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
