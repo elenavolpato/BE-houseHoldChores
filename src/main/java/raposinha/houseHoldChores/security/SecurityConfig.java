@@ -9,11 +9,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -39,8 +36,7 @@ public class SecurityConfig {
         // configures Route Permissions
         httpSecurity.authorizeHttpRequests(auth -> auth
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight
-                .requestMatchers("/api/auth/**").permitAll() // Login/Register are public
-                //requestMatchers("/").permitAll()
+                .requestMatchers("/api/auth/**","/swagger-ui/**", "/v3/api-docs/**").permitAll() // Login/Register are public
                 .anyRequest().authenticated()               // Everything else needs a token
         );
         httpSecurity.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
@@ -49,19 +45,6 @@ public class SecurityConfig {
 
         return httpSecurity.build();
     }
-
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .cors(Customizer.withDefaults())
-//                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()); // Open everything
-//
-//        return http.build();
-//    }
-
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

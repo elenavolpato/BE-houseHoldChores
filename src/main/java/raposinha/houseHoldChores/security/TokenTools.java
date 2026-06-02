@@ -1,6 +1,5 @@
 package raposinha.houseHoldChores.security;
 
-
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
