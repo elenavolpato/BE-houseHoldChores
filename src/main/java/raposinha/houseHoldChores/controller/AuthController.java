@@ -22,7 +22,7 @@ import raposinha.houseHoldChores.service.*;
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor
-@CrossOrigin(origins = {"http://localhost:5173", "https://elenavolpato.github.io"})
+@CrossOrigin(origins = {"http://localhost:5173", "https://elenavolpato.github.io", "https://householdchores.raposinha.dev"})
 public class AuthController {
 
     private final UserService userService;
