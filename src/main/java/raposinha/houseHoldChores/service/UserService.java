@@ -82,9 +82,13 @@ public class UserService {
             throw new RuntimeException("Cloudinary upload failed", e);
         }
         String url = (String) uploadResult.get("secure_url");
-        found.setAvatarUrl(url);
+        // Cloudinary also returns "version" as a Long, e.g. 1717123456
+        // secure_url already contains the version in the path: /v1717123456/user/uuid.jpg
+        Long version = ((Number) uploadResult.get("version")).longValue();
+        String versionedUrl = url.contains("?") ? url + "&v=" + version : url + "?v=" + version;
+        found.setAvatarUrl(versionedUrl);
         this.userRepo.save(found);
-        return url;
+        return versionedUrl;
     }
 
 

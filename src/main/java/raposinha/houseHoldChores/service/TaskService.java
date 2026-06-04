@@ -220,10 +220,9 @@ public class TaskService {
         }
 
         Long groupId = user.getGroup().getId();
-        System.out.println(groupId);
 
         List<Task> tasks = taskRepo.findByGroup_IdAndDueDateBetween(groupId, start, end);
-
+        System.out.println("tasks by group and due date between" + tasks);
         return tasks.stream()
                 .map(this::convertToResponseDTO) // Your internal DTO mapper helper
                 .toList();
