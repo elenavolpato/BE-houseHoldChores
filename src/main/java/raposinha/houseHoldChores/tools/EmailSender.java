@@ -20,27 +20,27 @@ public class EmailSender {
     // registration email
     public void sendRegistrationEmail(User recipient) {
         String htmlContent = """
-            <html>
-                <body style="font-family: Arial, sans-serif; color: #333;">
-                    <h1 style="color: #4A90E2;">Welcome %s!</h1>
-                    <p>We are thrilled to have you on board.</p>
-                    <p>Start organizing your home by checking your assigned tasks.</p>
-                    <br>
-                    <button>
-                        <a href="https://raposinha.dev" 
-                        style=" text-decoration: none;">
-                        Open Dashboard
-                        </a>
-                    </button>
-                </body>
-            </html>
+                <html>
+                   <body style="font-family: Arial, sans-serif; color: #333;">
+                       <h1 style="color: #1a2e44;">Welcome %s!</h1>
+                       <p>We are thrilled to have you on board.</p>
+                       <p>Start organizing your home by checking your assigned tasks.</p>
+                       <br>
+                       <a href="https://householdchores.raposinha.dev/login"
+                          style="display: inline-block; background-color: #0d7377; border: none;
+                                 padding: 1em 1.5em; text-decoration: none; color: #ffffff;
+                                 font-family: Arial, sans-serif; border-radius: 4px;">
+                           Open app
+                       </a>
+                   </body>
+               </html>
             """.formatted(recipient.getUsername());
         HttpResponse<String> response = Unirest.post(
                         "https://api.mailgun.net/v3/" + domainName + "/messages")
                 .basicAuth("api", apiKey)
-                .field("from", "Household Chores App <welcome@" + domainName + ">")
+                .field("from", "ChoreMate App <welcome@" + domainName + ">")
                 .field("to", recipient.getEmail())
-                .field("subject", "Welcome to Household Chores APP")
+                .field("subject", "Welcome to ChoreMate APP")
                 .field("text", "Welcome " + recipient.getUsername() + "!")
                 .field("html", htmlContent)
                 .asString();
@@ -66,7 +66,7 @@ public class EmailSender {
         String htmlContent = """
        <html>
         <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-            <h1 style="color: #4A90E2;">You've been invited to the HouseHold Chores app!</h1>
+            <h1 style="color: #4A90E2;">You've been invited to the ChoreMate app!</h1>
             <p>Hello <strong>%s</strong>,</p>
             <p><strong>%s</strong> has invited you to join their household. Start organizing your home together by checking your assigned tasks.</p>
             <br>
@@ -81,15 +81,16 @@ public class EmailSender {
         HttpResponse<String> response = Unirest.post(
                         "https://api.mailgun.net/v3/" + domainName + "/messages")
                 .basicAuth("api", apiKey)
-                .field("from", "Household Chores App <invite@" + domainName + ">")
+                .field("from", "ChoreMate App <invite@" + domainName + ">")
                 .field("to", recipientEmail)
-                .field("subject", "Invitation to Household Chores APP")
+                .field("subject", "Join ChoreMate")
                 .field("text", "Welcome " + recipientName + "! Join here: " + url)
                 .field("html", htmlContent)
                 .asString();
 
         System.out.println(response.getStatus() + domainName);
         System.out.println(response.getBody());
+
 
         if (response.getStatus() != 200) {
             throw new RuntimeException(
