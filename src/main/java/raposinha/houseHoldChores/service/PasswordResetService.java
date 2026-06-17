@@ -2,6 +2,7 @@ package raposinha.houseHoldChores.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,10 +26,13 @@ public class PasswordResetService {
     private final PasswordResetTokenRepo tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
+    @Value("${app.frontend.url}")
+    private String frontendBaseUrl;
 
-    private static final long EXPIRY_MINUTES = 30;
+    private static final long EXPIRY_MINUTES = 15;
     @Transactional
     public void processForgotPassword(ForgotPasswordRequest request) {
+
         userRepository.findByEmail(request.email()).ifPresent(user -> {
             tokenRepository.deleteByUser(user);
             tokenRepository.flush();
@@ -41,7 +45,7 @@ public class PasswordResetService {
             resetToken.setExpiresAt(LocalDateTime.now().plusMinutes(EXPIRY_MINUTES));
             tokenRepository.save(resetToken);
 
-            String resetLink = "https://localhost:5173/reset-password?token=" + token;
+            String resetLink = frontendBaseUrl + "/reset-password?token=" + token;
 
             // ← matches your existing pattern of passing user details
             emailSender.sendPasswordResetEmail(
