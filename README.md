@@ -20,8 +20,8 @@ The backend was built already with som functionalities that the FE hasn't deploy
 
 The production REST API is live and actively processes transactional operations. Interactive API exploration, live parameter testing, and schema contracts are fully handled via Swagger / OpenAPI 3.0.
 
-* **Production API Gateway Base URL:** `https://be-householdchores.onrender.com`
-* **Interactive Testing Panel:** 👉 **[Live Swagger UI Documentation](https://be-householdchores.onrender.com/swagger-ui/index.html)**
+* **Production API Gateway Base URL:** `(https://spring-boot-api-production-980f.up.railway.app/)`
+* **Interactive Testing Panel:** 👉 **[Live Swagger UI Documentation](https://spring-boot-api-production-980f.up.railway.app/swagger-ui/index.html)**
 
 > 🔐 **API Authentication Notice:** To invoke protected operations directly within Swagger, register or log in via the authentication resource endpoints. Copy the returned token, select the **Authorize** lock emblem at the top of the dashboard, and input the parameter as: `Bearer <your_token>`.
 
