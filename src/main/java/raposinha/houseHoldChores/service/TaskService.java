@@ -127,7 +127,7 @@ public class TaskService {
         return convertToResponseDTO(taskRepo.save(task));
     }
 
-    public String assignUserToTask(UUID userToAssign, Long taskId, User requester) {
+    public TaskResponseDTO assignUserToTask(UUID userToAssign, Long taskId, User requester) {
         //  find task
         Task foundTask = taskRepo.findById(taskId).orElseThrow(() -> new NotFoundException("Task with id "+ taskId + " was not found."));
         // from this foundTask, I get the groupId, and search for the owner.
@@ -151,9 +151,7 @@ public class TaskService {
 
         // assign to user
         foundTask.setAssignedTo(worker);
-        taskRepo.save(foundTask);
-
-        return "User " + worker.getUsername() + " successfully assigned to task: " + foundTask.getTitle();
+        return convertToResponseDTO(taskRepo.save(foundTask));
 
     }
 
@@ -237,12 +235,12 @@ public class TaskService {
                 task.getCategory() != null ? task.getCategory().getName() : null,
                 task.getDueDate(),
                 task.isCompleted(),
-                task.getAssignedTo() != null ? task.getAssignedTo().getUsername() : "Unassigned",
-                (task.getFrequency()),
-                category != null ? category.getIcon() : "circle-check", // fallback icon
+                assignedUser != null ? assignedUser.getId() : null,
+                assignedUser != null ? assignedUser.getUsername() : "Unassigned",
+                task.getFrequency(),
+                category != null ? category.getIcon() : "circle-check",
                 category != null ? category.getColorCode() : "#FFD700",
-                assignedUser != null ? assignedUser.getAvatarUrl() : "https://res.cloudinary.com/dga90puif/image/upload/q_auto/f_auto/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png"// fallback avatar
-
+                assignedUser != null ? assignedUser.getAvatarUrl() : "https://res.cloudinary.com/dga90puif/image/upload/q_auto/f_auto/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png"
         );
     }
 }
