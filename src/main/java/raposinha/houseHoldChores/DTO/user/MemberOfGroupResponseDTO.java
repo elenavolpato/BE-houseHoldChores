@@ -13,7 +13,7 @@ import java.util.UUID;
 public class MemberOfGroupResponseDTO {
     private UUID id;
     private String username;
-    private String avatarURl;
+    private String avatarUrl;
     private Group group;
     private GroupRole role;
     private String email;

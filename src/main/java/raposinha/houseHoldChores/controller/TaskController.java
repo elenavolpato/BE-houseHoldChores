@@ -54,13 +54,12 @@ public class TaskController {
     // assign task to someone
     // PATCH /api/tasks/2/assign
     @PatchMapping("/{taskId}/assign")
-    public ResponseEntity<String> assignUserToExistingTask(
+    public ResponseEntity<TaskResponseDTO> assignUserToExistingTask(
             @PathVariable Long taskId,
             @Valid @RequestBody AssignUserDTO body,
             @AuthenticationPrincipal User requester) {
-
-        String message = taskService.assignUserToTask(body.userId(), taskId, requester);
-        return ResponseEntity.ok(message);
+        TaskResponseDTO updatedTask = taskService.assignUserToTask(body.userId(), taskId, requester);
+        return ResponseEntity.ok(updatedTask);
     }
 
     //PATCH /api/tasks/1/due-date
