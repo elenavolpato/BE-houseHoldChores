@@ -62,7 +62,7 @@ public class TaskController {
         return ResponseEntity.ok(updatedTask);
     }
 
-    //PATCH /api/tasks/1/due-date
+    //PATCH /api/tasks/1000/due-date
     @PatchMapping("/{taskId}/due-date")
     public ResponseEntity<TaskResponseDTO> changeDueDate(
             @PathVariable Long taskId,

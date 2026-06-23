@@ -1,5 +1,7 @@
 package raposinha.houseHoldChores.DTO.task;
 
+import jakarta.validation.constraints.FutureOrPresent;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 

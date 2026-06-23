@@ -54,7 +54,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "https://elenavolpato.github.io",
-                "https://householdchores.raposinha.dev"
+                "https://choremate.raposinha.dev"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // 👈
 
