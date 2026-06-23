@@ -2,6 +2,7 @@ package raposinha.houseHoldChores.service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import raposinha.houseHoldChores.DTO.task.*;
 import raposinha.houseHoldChores.entities.*;
@@ -9,13 +10,15 @@ import raposinha.houseHoldChores.exception.BadRequestException;
 import raposinha.houseHoldChores.exception.NotFoundException;
 import raposinha.houseHoldChores.exception.UnauthorizedException;
 import raposinha.houseHoldChores.repositories.*;
-
+import org.springframework.data.domain.Pageable;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -86,6 +89,7 @@ public class TaskService {
         newTask.setSourcePreset(preset);
 
         Task savedTask = taskRepo.save(newTask);
+        generateOccurrencesForTask(savedTask);
         return convertToResponseDTO(savedTask);
     }
 
@@ -118,7 +122,8 @@ public class TaskService {
         } else {
             task.setAssignedTo(null); // explicitly unassigned
         }
-
+        Task savedTask = taskRepo.save(task);
+        generateOccurrencesForTask(savedTask);
         return convertToResponseDTO(taskRepo.save(task));
     }
 
@@ -169,13 +174,20 @@ public class TaskService {
         Task task = taskRepo.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task not found"));
 
-        // only admin can change frequencies
         if (!task.getGroup().getOwner().getId().equals(requester.getId())) {
             throw new UnauthorizedException("Only the group admin can change task frequencies.");
         }
 
         task.setFrequency(dto.frequency());
-        return convertToResponseDTO(taskRepo.save(task));
+        Task savedTask = taskRepo.saveAndFlush(task); // 👈 flush immediately so delete sees the updated state
+
+        if (savedTask.getParentTask() == null) {
+            taskRepo.deleteFutureOccurrences(taskId, LocalDateTime.now());
+            taskRepo.flush();
+            generateOccurrencesForTask(savedTask);
+        }
+
+        return convertToResponseDTO(savedTask);
     }
 
     @Transactional
@@ -237,5 +249,42 @@ public class TaskService {
                 category != null ? category.getColorCode() : "#FFD700",
                 assignedUser != null ? assignedUser.getAvatarUrl() : "https://res.cloudinary.com/dga90puif/image/upload/q_auto/f_auto/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png"
         );
+    }
+
+    @Transactional
+    public void generateUpcomingOccurrences() {
+        List<Task> templates = taskRepo.findAllUserCreatedTasks();
+        System.out.println("Scheduler found {} templates"+ templates.size());
+        templates.forEach(this::generateOccurrencesForTask);
+    }
+
+    @Transactional
+    public void generateOccurrencesForTask(Task template) {
+        if (template.getFrequency() <= 0 || template.getDueDate() == null) return;
+
+        LocalDateTime horizon = LocalDateTime.now().plusMonths(2);
+
+        Pageable limit = PageRequest.of(0, 1);
+        List<Task> latest = taskRepo.findOccurrencesSortedByDueDate(template.getId(), limit);
+
+        LocalDateTime nextDueDate = latest.stream().findFirst()
+                .map(t -> t.getDueDate().plusDays(template.getFrequency()))
+                .orElse(template.getDueDate().plusDays(template.getFrequency()));
+
+        List<Task> occurrences = new ArrayList<>();
+        while (nextDueDate.isBefore(horizon)) {
+            Task occurrence = new Task();
+            occurrence.setTitle(template.getTitle());
+            occurrence.setCategory(template.getCategory());
+            occurrence.setGroup(template.getGroup());
+            occurrence.setFrequency(template.getFrequency());
+            occurrence.setAssignedTo(template.getAssignedTo());
+            occurrence.setDueDate(nextDueDate);
+            occurrence.setCompleted(false);
+            occurrence.setParentTask(template);
+            occurrences.add(occurrence);
+            nextDueDate = nextDueDate.plusDays(template.getFrequency());
+        }
+        taskRepo.saveAll(occurrences);
     }
 }

@@ -58,5 +58,8 @@ public class Task {
     @JoinColumn(name = "preset_task_id")
     private PresetTask sourcePreset;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_task_id", nullable = true)
+    private Task parentTask;
 
 }
