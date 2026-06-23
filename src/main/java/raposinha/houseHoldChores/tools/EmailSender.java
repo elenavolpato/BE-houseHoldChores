@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 public class EmailSender {
     private final String domainName;
     private final String apiKey;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
     public EmailSender(@Value("${mailgun.domainName}") String domainName, @Value("${mailgun.apiKey}") String apiKey) {
         this.domainName = domainName;
         this.apiKey = apiKey;
@@ -26,7 +29,7 @@ public class EmailSender {
                        <p>We are thrilled to have you on board.</p>
                        <p>Start organizing your home by checking your assigned tasks.</p>
                        <br>
-                       <a href="https://householdchores.raposinha.dev/login"
+                       <a href="%s/login"
                           style="display: inline-block; background-color: #0d7377; border: none;
                                  padding: 1em 1.5em; text-decoration: none; color: #ffffff;
                                  font-family: Arial, sans-serif; border-radius: 4px;">
@@ -34,7 +37,7 @@ public class EmailSender {
                        </a>
                    </body>
                </html>
-            """.formatted(recipient.getUsername());
+            """.formatted(recipient.getUsername(),frontendUrl);
         HttpResponse<String> response = Unirest.post(
                         "https://api.mailgun.net/v3/" + domainName + "/messages")
                 .basicAuth("api", apiKey)
