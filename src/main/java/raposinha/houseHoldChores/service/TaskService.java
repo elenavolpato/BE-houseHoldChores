@@ -35,7 +35,7 @@ public class TaskService {
             throw new BadRequestException("You must belong to a household group to view task templates.");
         }
         Long groupId = requester.getGroup().getId();
-        List<PresetTask> availablePresets = presetRepo.findGlobalAndByGroupId(groupId);
+        List<PresetTask> availablePresets = presetRepo.findAvailablePresetsForGroup(groupId);
 
         return availablePresets.stream()
                 .map(preset -> {
@@ -56,39 +56,34 @@ public class TaskService {
 
     @Transactional
     public TaskResponseDTO createTaskFromPreset(CreateTaskFromPresetDTO dto, User loggedInUser) {
-        // fetch presetTask
         if (dto.presetId() == null) {
             throw new BadRequestException("Preset ID must not be null.");
         }
         PresetTask preset = presetRepo.findById(dto.presetId())
                 .orElseThrow(() -> new NotFoundException("Preset task not found"));
 
-        // resolve Group securely using the logged-in user's profile
         if (loggedInUser.getGroup() == null) {
             throw new BadRequestException("You must belong to a household group to create chores.");
         }
-        Group group = loggedInUser.getGroup(); // No extra DB lookup required!
+        Group group = loggedInUser.getGroup();
 
-        // only lookup if a non-null ID is provided
-        User assignedUser = null;
-        if (dto.assignedUserId() != null) {
-            assignedUser = userRepo.findById(dto.assignedUserId())
-                    .orElseThrow(() -> new NotFoundException("Assigned user not found"));
-        } else {
-            // Fallback: Assign it to the creator if no user ID was provided in the payload
-            assignedUser = loggedInUser;
+        if (dto.dueDate() != null && dto.dueDate().toLocalDate().isBefore(LocalDate.now())) {
+            throw new BadRequestException("Due date cannot be in the past.");
         }
+        User assignedUser = dto.assignedUserId() != null
+                ? userRepo.findById(dto.assignedUserId())
+                .orElseThrow(() -> new NotFoundException("Assigned user not found"))
+                : loggedInUser;
 
-        // 4. Create and map the live Task layout
         Task newTask = new Task();
         newTask.setTitle(preset.getTitle());
         newTask.setCategory(preset.getCategory());
         newTask.setFrequency(dto.frequency() > 0 ? dto.frequency() : preset.getFrequency());
-
         newTask.setAssignedTo(assignedUser);
         newTask.setGroup(group);
         newTask.setDueDate(dto.dueDate());
         newTask.setCompleted(false);
+        newTask.setSourcePreset(preset);
 
         Task savedTask = taskRepo.save(newTask);
         return convertToResponseDTO(savedTask);

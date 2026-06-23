@@ -54,5 +54,9 @@ public class Task {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "preset_task_id")
+    private PresetTask sourcePreset;
+
 
 }
