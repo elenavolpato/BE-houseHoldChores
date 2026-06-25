@@ -1,11 +1,10 @@
 package raposinha.houseHoldChores.controller;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import raposinha.houseHoldChores.DTO.RegisterWithInviteDTO;
 import raposinha.houseHoldChores.DTO.password.ForgotPasswordRequest;
@@ -14,14 +13,12 @@ import raposinha.houseHoldChores.DTO.user.LoginRequestDTO;
 import raposinha.houseHoldChores.DTO.user.LoginResponseDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationRequestDTO;
 import raposinha.houseHoldChores.DTO.user.UserRegistrationResponseDTO;
-import raposinha.houseHoldChores.entities.Group;
 import raposinha.houseHoldChores.entities.Invitation;
 import raposinha.houseHoldChores.entities.User;
 import raposinha.houseHoldChores.service.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@AllArgsConstructor
 @CrossOrigin(origins = {"http://localhost:5173", "https://elenavolpato.github.io", "https://householdchores.raposinha.dev"})
 public class AuthController {
 
@@ -30,6 +27,20 @@ public class AuthController {
     private final GroupService groupService;
     private final InvitationService invitationService;
     private final PasswordResetService passwordResetService;
+
+    @Value("${app.version}")
+    private String appVersion;
+
+    @Autowired // 👈 explicit constructor for the services only
+    public AuthController(UserService userService, AuthService authService,
+                          GroupService groupService, InvitationService invitationService,
+                          PasswordResetService passwordResetService) {
+        this.userService = userService;
+        this.authService = authService;
+        this.groupService = groupService;
+        this.invitationService = invitationService;
+        this.passwordResetService = passwordResetService;
+    }
 
     // POST /api/auth/register
     @PostMapping("/register")
@@ -96,5 +107,10 @@ public class AuthController {
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         passwordResetService.resetPassword(request);
         return ResponseEntity.ok("Password reset successfully.");
+    }
+
+    @GetMapping("/api/version")
+    public ResponseEntity<String> getVersion() {
+        return ResponseEntity.ok(appVersion);
     }
 }
