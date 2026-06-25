@@ -76,7 +76,7 @@ public class TaskService {
         User assignedUser = dto.assignedUserId() != null
                 ? userRepo.findById(dto.assignedUserId())
                 .orElseThrow(() -> new NotFoundException("Assigned user not found"))
-                : loggedInUser;
+                : null;
 
         Task newTask = new Task();
         newTask.setTitle(preset.getTitle());
@@ -140,17 +140,23 @@ public class TaskService {
             throw new UnauthorizedException("Only the group administrator can assign tasks.");
         }
 
-        // find user to be assigned
-        User worker = userRepo.findById(userToAssign)
-                .orElseThrow(() -> new NotFoundException("User to assign not found."));
+        //allow task do be unassigned
+        if (userToAssign == null) {
+                foundTask.setAssignedTo(null);}
 
-        // check if user belongs to group
-        if (worker.getGroup() == null || !worker.getGroup().getId().equals(taskGroup.getId())) {
-            throw new BadRequestException("The assigned user does not belong to this household group.");
+        else{
+            //find user to be assigned
+            User worker = userRepo.findById(userToAssign)
+                    .orElseThrow(() -> new NotFoundException("User to assign not found."));
+
+            // check if user belongs to group
+            if (worker.getGroup() == null || !worker.getGroup().getId().equals(taskGroup.getId())) {
+                throw new BadRequestException("The assigned user does not belong to this household group.");
+            }
+
+            // assign to user
+            foundTask.setAssignedTo(worker);
         }
-
-        // assign to user
-        foundTask.setAssignedTo(worker);
         return convertToResponseDTO(taskRepo.save(foundTask));
 
     }
@@ -247,7 +253,7 @@ public class TaskService {
                 task.getFrequency(),
                 category != null ? category.getIcon() : "circle-check",
                 category != null ? category.getColorCode() : "#FFD700",
-                assignedUser != null ? assignedUser.getAvatarUrl() : "https://res.cloudinary.com/dga90puif/image/upload/q_auto/f_auto/v1778151410/Screenshot_from_2026-05-07_12-53-38_tch5d6.png"
+                assignedUser != null ? assignedUser.getAvatarUrl() : null
         );
     }
 

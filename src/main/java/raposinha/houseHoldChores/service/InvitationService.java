@@ -46,9 +46,7 @@ public class InvitationService {
 
         invitationRepo.save(invitation);
 
-
-        String secureInviteUrl = String.format("%s/register-with-invite?token=%s", frontendBaseUrl, secureToken);
-        System.out.println("DEBUG SECURE LINK GENERATED: " + secureInviteUrl);
+        String secureInviteUrl = String.format("%s/register-with-invite?token=%s", frontendBaseUrl, secureToken) + "&email="+dto.recipientEmail() + "&username="+dto.recipientName() ;
 
         emailSender.sendInvitationEmail(
                 inviter,
