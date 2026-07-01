@@ -84,5 +84,25 @@ public class GroupController {
     }
 
 
+    // PATCH /api/groups/{groupId}/members/{userId}/make-admin
+    @PatchMapping("/{groupId}/members/{userId}/make-admin")
+    public ResponseEntity<String> makeAdmin(
+            @PathVariable Long groupId,
+            @PathVariable UUID userId,
+            @AuthenticationPrincipal User requester) {
+        String message = groupService.makeAdmin(groupId, userId, requester);
+        return ResponseEntity.ok(message);
+    }
+
+    // PATCH /api/groups/{groupId}/members/{userId}/revoke-admin
+    @PatchMapping("/{groupId}/members/{userId}/revoke-admin")
+    public ResponseEntity<String> revokeAdmin(
+            @PathVariable Long groupId,
+            @PathVariable UUID userId,
+            @AuthenticationPrincipal User requester) {
+        String message = groupService.revokeAdmin(groupId, userId, requester);
+        return ResponseEntity.ok(message);
+    }
+
 
 }

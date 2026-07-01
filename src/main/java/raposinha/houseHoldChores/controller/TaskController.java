@@ -73,13 +73,12 @@ public class TaskController {
 
     // PATCH /api/tasks/1/frequency
     @PatchMapping("/{taskId}/frequency")
-    public ResponseEntity<TaskResponseDTO> changeFrequency(
+    public ResponseEntity<TaskFrequencyUpdateResultDTO> changeFrequency(
             @PathVariable Long taskId,
             @Valid @RequestBody UpdateFrequencyDTO dto,
             @AuthenticationPrincipal User requester) {
         return ResponseEntity.ok(taskService.updateFrequency(taskId, dto, requester));
     }
-
     // PATCH /api/tasks/1/complete
     @PatchMapping("/{taskId}/complete")
     public ResponseEntity<TaskResponseDTO> completeTask(
@@ -105,5 +104,13 @@ public class TaskController {
 
         List<TaskResponseDTO> tasks = taskService.getTasksByGroupAndRange(user, start, end);
         return ResponseEntity.ok(tasks);
+    }
+
+    @PatchMapping("/{taskId}/description")
+    public ResponseEntity<TaskResponseDTO> updateDescription(
+            @PathVariable Long taskId,
+            @RequestBody UpdateDescriptionDTO dto,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(taskService.updateDescription(taskId, dto, user));
     }
 }

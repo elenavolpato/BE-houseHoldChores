@@ -41,4 +41,10 @@ public interface TaskRepo extends JpaRepository<Task, Long> {
     @Modifying
     @Query("DELETE FROM Task t WHERE t.parentTask.id = :templateId AND t.dueDate > :now AND t.isCompleted = false")
     void deleteFutureOccurrences(@Param("templateId") Long templateId, @Param("now") LocalDateTime now);
+
+    @Query("SELECT t.id FROM Task t WHERE t.parentTask.id = :templateId AND t.dueDate > :now AND t.isCompleted = false")
+    List<Long> findFutureOccurrenceIds(@Param("templateId") Long templateId, @Param("now") LocalDateTime now);
+
+
+
 }

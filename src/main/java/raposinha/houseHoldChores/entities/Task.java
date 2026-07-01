@@ -62,4 +62,8 @@ public class Task {
     @JoinColumn(name = "parent_task_id", nullable = true)
     private Task parentTask;
 
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
+
 }

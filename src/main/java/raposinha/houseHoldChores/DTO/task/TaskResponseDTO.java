@@ -15,6 +15,7 @@ public record TaskResponseDTO(
         int frequency,
         String icon,
         String colorCode,
-        String avatarUrl
+        String avatarUrl,
+        String description
 
 ) {}

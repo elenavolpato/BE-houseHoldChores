@@ -170,6 +170,60 @@ public class GroupService {
         return groupRepo.findByOwnerEmail(email)
                 .orElseThrow(() -> new NotFoundException("No active group managed by this administrator email."));
     }
+
+    public String makeAdmin(Long groupId, UUID targetUserId, User requester) {
+        Group group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new NotFoundException("Group not found."));
+
+        // only the current admin can promote another user
+        if (!group.getOwner().getId().equals(requester.getId())) {
+            throw new UnauthorizedException("Only the group admin can assign admin rights.");
+        }
+
+        User targetUser = userRepo.findById(targetUserId)
+                .orElseThrow(() -> new NotFoundException("User not found."));
+
+        // user must belong to the group
+        if (targetUser.getGroup() == null || !targetUser.getGroup().getId().equals(groupId)) {
+            throw new BadRequestException("User does not belong to this group.");
+        }
+
+        targetUser.setRole(GroupRole.ADMIN);
+        userRepo.save(targetUser);
+
+        return targetUser.getUsername() + " is now an admin.";
+    }
+
+    public String revokeAdmin(Long groupId, UUID targetUserId, User requester) {
+        Group group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new NotFoundException("Group not found."));
+
+        // only the current admin can revoke rights
+        if (!group.getOwner().getId().equals(requester.getId())) {
+            throw new UnauthorizedException("Only the group admin can revoke admin rights.");
+        }
+
+        // admin cannot revoke their own rights
+        if (requester.getId().equals(targetUserId)) {
+            throw new BadRequestException("You cannot revoke your own admin rights.");
+        }
+
+        User targetUser = userRepo.findById(targetUserId)
+                .orElseThrow(() -> new NotFoundException("User not found."));
+
+        if (targetUser.getGroup() == null || !targetUser.getGroup().getId().equals(groupId)) {
+            throw new BadRequestException("User does not belong to this group.");
+        }
+
+        if (!targetUser.getRole().equals(GroupRole.ADMIN)) {
+            throw new BadRequestException(targetUser.getUsername() + " is not an admin.");
+        }
+
+        targetUser.setRole(GroupRole.USER);
+        userRepo.save(targetUser);
+
+        return targetUser.getUsername() + " admin rights have been revoked.";
+    }
 }
 
 

@@ -59,6 +59,7 @@ public class TaskService {
 
     @Transactional
     public TaskResponseDTO createTaskFromPreset(CreateTaskFromPresetDTO dto, User loggedInUser) {
+        System.out.println("assigned" + dto.assignedUserId());
         if (dto.presetId() == null) {
             throw new BadRequestException("Preset ID must not be null.");
         }
@@ -176,24 +177,32 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDTO updateFrequency(Long taskId, UpdateFrequencyDTO dto, User requester) {
+    public TaskFrequencyUpdateResultDTO updateFrequency(Long taskId, UpdateFrequencyDTO dto, User requester) {
         Task task = taskRepo.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task not found"));
 
         if (!task.getGroup().getOwner().getId().equals(requester.getId())) {
             throw new UnauthorizedException("Only the group admin can change task frequencies.");
         }
+        List<Long> deletedIds = List.of();
+        List<Task> newOccurrenceEntities = List.of();
 
         task.setFrequency(dto.frequency());
-        Task savedTask = taskRepo.saveAndFlush(task); // 👈 flush immediately so delete sees the updated state
+        Task savedTask = taskRepo.saveAndFlush(task);
 
         if (savedTask.getParentTask() == null) {
+            deletedIds = taskRepo.findFutureOccurrenceIds(taskId, LocalDateTime.now());
+
             taskRepo.deleteFutureOccurrences(taskId, LocalDateTime.now());
             taskRepo.flush();
-            generateOccurrencesForTask(savedTask);
-        }
 
-        return convertToResponseDTO(savedTask);
+            newOccurrenceEntities = generateOccurrencesForTask(savedTask);
+        }
+        return new TaskFrequencyUpdateResultDTO(
+                convertToResponseDTO(savedTask),
+                deletedIds,
+                newOccurrenceEntities.stream().map(this::convertToResponseDTO).toList()
+        );
     }
 
     @Transactional
@@ -233,7 +242,7 @@ public class TaskService {
         Long groupId = user.getGroup().getId();
 
         List<Task> tasks = taskRepo.findByGroup_IdAndDueDateBetween(groupId, start, end);
-        System.out.println("tasks by group and due date between" + tasks);
+        //System.out.println("tasks by group and due date between" + tasks);
         return tasks.stream()
                 .map(this::convertToResponseDTO) // Your internal DTO mapper helper
                 .toList();
@@ -253,26 +262,25 @@ public class TaskService {
                 task.getFrequency(),
                 category != null ? category.getIcon() : "circle-check",
                 category != null ? category.getColorCode() : "#FFD700",
-                assignedUser != null ? assignedUser.getAvatarUrl() : null
+                assignedUser != null ? assignedUser.getAvatarUrl() : null,
+                task.getDescription()
         );
     }
 
     @Transactional
     public void generateUpcomingOccurrences() {
         List<Task> templates = taskRepo.findAllUserCreatedTasks();
-        System.out.println("Scheduler found {} templates"+ templates.size());
+        System.out.println("Scheduler found " + templates.size() + " templates");
         templates.forEach(this::generateOccurrencesForTask);
     }
 
     @Transactional
-    public void generateOccurrencesForTask(Task template) {
-        if (template.getFrequency() <= 0 || template.getDueDate() == null) return;
+    public List<Task> generateOccurrencesForTask(Task template) {
+        if (template.getFrequency() <= 0 || template.getDueDate() == null) return List.of();
 
         LocalDateTime horizon = LocalDateTime.now().plusMonths(2);
-
         Pageable limit = PageRequest.of(0, 1);
         List<Task> latest = taskRepo.findOccurrencesSortedByDueDate(template.getId(), limit);
-
         LocalDateTime nextDueDate = latest.stream().findFirst()
                 .map(t -> t.getDueDate().plusDays(template.getFrequency()))
                 .orElse(template.getDueDate().plusDays(template.getFrequency()));
@@ -291,6 +299,20 @@ public class TaskService {
             occurrences.add(occurrence);
             nextDueDate = nextDueDate.plusDays(template.getFrequency());
         }
-        taskRepo.saveAll(occurrences);
+
+        return taskRepo.saveAll(occurrences);
+    }
+
+    @Transactional
+    public TaskResponseDTO updateDescription(Long taskId, UpdateDescriptionDTO dto, User requester) {
+        Task task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Task not found"));
+
+        if (!task.getGroup().getOwner().getId().equals(requester.getId())) {
+            throw new UnauthorizedException("Only the group admin can update task descriptions.");
+        }
+
+        task.setDescription(dto.description());
+        return convertToResponseDTO(taskRepo.save(task));
     }
 }

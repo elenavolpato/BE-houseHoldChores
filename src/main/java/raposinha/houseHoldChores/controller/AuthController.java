@@ -109,7 +109,7 @@ public class AuthController {
         return ResponseEntity.ok("Password reset successfully.");
     }
 
-    @GetMapping("/api/version")
+    @GetMapping("/version")
     public ResponseEntity<String> getVersion() {
         return ResponseEntity.ok(appVersion);
     }
